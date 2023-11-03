@@ -1,0 +1,15 @@
+---
+version: '3'
+
+services:
+  frigate-telegram:
+    image: ghcr.io/oldtyt/frigate-telegram
+    restart: always
+    environment:
+      TELEGRAM_BOT_TOKEN: 1234567890:ABCDEFGHEFGREHBTYJBTRGBER34T54Y54
+      FRIGATE_URL: http://192.168.0.254:5000
+      FRIGATE_EVENT_LIMIT: 5
+      DEBUG: False
+      TELEGRAM_CHAT_ID: "0"
+      SLEEP_TIME: 30
+      FRIGATE_EXTERNAL_URL: https://frigate.domain.com

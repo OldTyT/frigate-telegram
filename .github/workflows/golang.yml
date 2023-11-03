@@ -1,0 +1,31 @@
+name: Test golang build and lint
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+
+jobs:
+  golangci:
+    name: Lint check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v3
+        with:
+          go-version: 1.21.x
+      - uses: actions/checkout@v3
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+  build:
+    name: Test build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.21.x
+      - run: go build .
