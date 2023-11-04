@@ -13,3 +13,4 @@ services:
       TELEGRAM_CHAT_ID: "0"
       SLEEP_TIME: 30
       FRIGATE_EXTERNAL_URL: https://frigate.domain.com
+      TZ: Europe/Berlin

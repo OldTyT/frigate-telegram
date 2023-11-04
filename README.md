@@ -18,3 +18,4 @@ Frigate telegram event notifications.
 | `TELEGRAM_CHAT_ID` | `0` | Telegram chat id. |
 | `SLEEP_TIME`| `5` | Sleep time after cycle, in second. |
 | `FRIGATE_EXTERNAL_URL` | `http://localhost:5000` | External link in frigate(need for generate link in message). |
+| `TZ` | `""` | Timezone |
