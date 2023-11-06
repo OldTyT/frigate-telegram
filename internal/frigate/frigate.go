@@ -176,20 +176,20 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	conf := config.New()
 
 	// Prepare text message
-	text := ""
-	text = text + "Camera: " + FrigateEvent.Camera + "\n"
-	text = text + "Label: " + FrigateEvent.Label + "\n"
+	text := "*Event*\n"
+	text = text + "┣*Camera*\n┗ `" + FrigateEvent.Camera + "`\n"
+	text = text + "┣*Label*\n┗ `" + FrigateEvent.Label + "`\n"
 	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
-	text = text + fmt.Sprintf("Start time: %s", t_start) + "\n"
+	text = text + fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
 	if FrigateEvent.EndTime == 0 {
-		text = text + "End time: In progess" + "\n"
+		text = text + "┣*End time*\n┗ `In progess`" + "\n"
 	} else {
 		t_end := time.Unix(int64(FrigateEvent.EndTime), 0)
-		text = text + fmt.Sprintf("End time: %s", t_end) + "\n"
+		text = text + fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
 	}
-	text = text + fmt.Sprintf("Top score: %f", (FrigateEvent.TopScore*100)) + "%\n"
-	text = text + "Event id: " + FrigateEvent.ID + "\n"
-	text = text + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label
+	text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.TopScore*100)) + "%`\n"
+	text = text + "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
+	text = text + "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label
 
 	// Save thumbnail
 	FilePathThumbnail := SaveThumbnail(FrigateEvent.Thumbnail)
@@ -198,6 +198,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	var medias []interface{}
 	MediaThumbnail := tgbotapi.NewInputMediaPhoto(tgbotapi.FilePath(FilePathThumbnail))
 	MediaThumbnail.Caption = text
+	MediaThumbnail.ParseMode = tgbotapi.ModeMarkdown
 	medias = append(medias, MediaThumbnail)
 
 	if FrigateEvent.HasClip && FrigateEvent.EndTime != 0 {
