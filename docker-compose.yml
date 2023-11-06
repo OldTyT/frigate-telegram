@@ -14,3 +14,8 @@ services:
       SLEEP_TIME: 30
       FRIGATE_EXTERNAL_URL: https://frigate.domain.com
       TZ: Europe/Berlin
+    volumes:
+      - type: tmpfs # Optional
+        target: /tmp
+        tmpfs:
+          size: 10000000

@@ -27,7 +27,7 @@ func LogFunc() {
 	if conf.Debug {
 		file = os.Stdout
 	}
-	Debug = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	Debug = log.New(file, "DEBUG: ", log.Ldate|log.Ltime|log.Lshortfile)
 	Info = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 	Warn = log.New(os.Stdout, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
 	Error = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
