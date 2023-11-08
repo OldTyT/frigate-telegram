@@ -7,7 +7,11 @@ Frigate telegram event notifications.
 
 ---
 
-## How to use
+## Example of work
+
+![alt text](https://raw.githubusercontent.com/OldTyT/frigate-telegram/main/resources/img/telegram_msg.png)
+
+## How to start
 
 1. Install docker
 2. Download `docker-compose.yml` file:
@@ -21,7 +25,7 @@ docker compose up -d
 ```
 5. Profit!
 
-### ENV variables
+### Environment variables
 
 | Variable | Default value | Description |
 | ----------- | ----------- | ----------- |
@@ -33,7 +37,3 @@ docker compose up -d
 | `SLEEP_TIME`| `5` | Sleep time after cycle, in second. |
 | `FRIGATE_EXTERNAL_URL` | `http://localhost:5000` | External link in frigate(need for generate link in message). |
 | `TZ` | `""` | Timezone |
-
-## Example of work
-
-![alt text](https://raw.githubusercontent.com/OldTyT/frigate-telegram/main/resources/img/telegram_msg.jpg)
