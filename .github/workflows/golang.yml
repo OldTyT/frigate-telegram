@@ -1,4 +1,4 @@
-name: Test golang build and lint
+name: Test golang lint
 on:
   push:
   pull_request:
