@@ -7,7 +7,21 @@ Frigate telegram event notifications.
 
 ---
 
-## ENV variables
+## How to use
+
+1. Install docker
+2. Download `docker-compose.yml` file:
+```bash
+https://raw.githubusercontent.com/OldTyT/frigate-telegram/main/docker-compose.yml
+```
+3. Change environment variables in docker-compose
+4. Deploy:
+```bash
+docker compose up -d
+```
+5. Profit!
+
+### ENV variables
 
 | Variable | Default value | Description |
 | ----------- | ----------- | ----------- |
@@ -19,3 +33,7 @@ Frigate telegram event notifications.
 | `SLEEP_TIME`| `5` | Sleep time after cycle, in second. |
 | `FRIGATE_EXTERNAL_URL` | `http://localhost:5000` | External link in frigate(need for generate link in message). |
 | `TZ` | `""` | Timezone |
+
+## Example of work
+
+![alt text](https://raw.githubusercontent.com/OldTyT/frigate-telegram/main/resources/img/telegram_msg.jpg)

@@ -3,6 +3,8 @@ name: Docker Image CI(GitHub)
 
 on:
   push:
+    branches:
+      - main
 
 
 jobs:
