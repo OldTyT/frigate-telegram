@@ -230,7 +230,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	if FrigateEvent.EndTime != 0 {
 		State = "Finished"
 	}
-	redis.AddNewEvent(FrigateEvent.ID, State)
+	go redis.AddNewEvent(FrigateEvent.ID, State)
 }
 
 func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI) {
@@ -238,7 +238,7 @@ func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI) {
 	for Event := range FrigateEvents {
 		if redis.CheckEvent(FrigateEvents[Event].ID) {
 			log.Info.Println("Found new event. ID - ", FrigateEvents[Event].ID)
-			go SendMessageEvent(FrigateEvents[Event], bot)
+			SendMessageEvent(FrigateEvents[Event], bot)
 		}
 	}
 }
