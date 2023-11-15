@@ -14,6 +14,7 @@ import (
 
 	"github.com/oldtyt/frigate-telegram/internal/config"
 	"github.com/oldtyt/frigate-telegram/internal/log"
+	"github.com/oldtyt/frigate-telegram/internal/redis"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -62,7 +63,6 @@ type EventStruct struct {
 
 var Events EventsStruct
 var Event EventStruct
-var LastStartTime float64 = 1
 
 func ErrorSend(TextError string, bot *tgbotapi.BotAPI) {
 	conf := config.New()
@@ -100,9 +100,6 @@ func GetEvents(FrigateURL string, bot *tgbotapi.BotAPI) EventsStruct {
 	conf := config.New()
 
 	FrigateURL = FrigateURL + "?limit=" + strconv.Itoa(conf.FrigateEventLimit)
-	if LastStartTime > 0 {
-		FrigateURL = FrigateURL + fmt.Sprintf("&after=%f", LastStartTime)
-	}
 
 	log.Debug.Println("Geting events from Frigate via URL: " + FrigateURL)
 
@@ -228,18 +225,20 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	if messages == nil {
 		ErrorSend("No received messages", bot)
 	}
+	var State string
+	State = "InProgress"
+	if FrigateEvent.EndTime != 0 {
+		State = "Finished"
+	}
+	redis.AddNewEvent(FrigateEvent.ID, State)
 }
 
 func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI) {
 	// Parse events
 	for Event := range FrigateEvents {
-		log.Info.Println("Found new event. ID - ", FrigateEvents[Event].ID)
-		if LastStartTime == 0 {
-			LastStartTime = FrigateEvents[Event].StartTime
+		if redis.CheckEvent(FrigateEvents[Event].ID) {
+			log.Info.Println("Found new event. ID - ", FrigateEvents[Event].ID)
+			go SendMessageEvent(FrigateEvents[Event], bot)
 		}
-		if FrigateEvents[Event].StartTime > LastStartTime && FrigateEvents[Event].EndTime != 0 {
-			LastStartTime = FrigateEvents[Event].StartTime
-		}
-		SendMessageEvent(FrigateEvents[Event], bot)
 	}
 }

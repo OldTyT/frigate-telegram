@@ -1,10 +1,20 @@
 ---
 version: '3'
+networks:
+  net:
 
 services:
+  redis:
+    image: redis:7.2.3-alpine3.18
+    networks: [net]
+    restart: always
+    volumes:
+      - /data:/mnt/docker/redis/data
+
   frigate-telegram:
     image: ghcr.io/oldtyt/frigate-telegram
     restart: always
+    networks: [net]
     environment:
       TELEGRAM_BOT_TOKEN: 1234567890:ABCDEFGHEFGREHBTYJBTRGBER34T54Y54
       FRIGATE_URL: http://192.168.0.254:5000
