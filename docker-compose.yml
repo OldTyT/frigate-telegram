@@ -24,6 +24,7 @@ services:
       SLEEP_TIME: 30
       FRIGATE_EXTERNAL_URL: https://frigate.domain.com
       TZ: Europe/Berlin
+      REDIS_ADDR: "redis:6379"
     volumes:
       - type: tmpfs # Optional
         target: /tmp

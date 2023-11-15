@@ -31,7 +31,7 @@ func New() *Config {
 		FrigateEventLimit:  getEnvAsInt("FRIGATE_EVENT_LIMIT", 50),
 		Debug:              getEnvAsBool("DEBUG", false),
 		TelegramChatID:     getEnvAsInt64("TELEGRAM_CHAT_ID", 0),
-		SleepTime:          getEnvAsInt("SLEEP_TIME", 5),
+		SleepTime:          getEnvAsInt("SLEEP_TIME", 30),
 		FrigateExternalURL: getEnv("FRIGATE_EXTERNAL_URL", "http://localhost:5000"),
 		RedisAddr:          getEnv("REDIS_ADDR", "localhost:6379"),
 		RedisPassword:      getEnv("REDIS_PASSWORD", ""),
