@@ -152,6 +152,9 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 	}
 	defer f.Close()
 
+	// Sleep for wait full save videos
+	time.Sleep(time.Duration(conf.SleepTime) * time.Second)
+	
 	// Download clip file
 	resp, err := http.Get(ClipURL)
 	if err != nil {
