@@ -200,7 +200,6 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		t_end := time.Unix(int64(FrigateEvent.EndTime), 0)
 		text = text + fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
 	}
-	text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.TopScore*100)) + "%`\n"
 	text = text + "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
 	text = text + "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
 	text = text + "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label
