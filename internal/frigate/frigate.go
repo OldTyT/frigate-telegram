@@ -42,28 +42,36 @@ type EventsStruct []struct {
 }
 
 type EventStruct struct {
-	Area               any      `json:"area"`
-	Box                any      `json:"box"`
-	Camera             string   `json:"camera"`
-	EndTime            float64  `json:"end_time"`
-	FalsePositive      any      `json:"false_positive"`
-	HasClip            bool     `json:"has_clip"`
-	HasSnapshot        bool     `json:"has_snapshot"`
-	ID                 string   `json:"id"`
-	Label              string   `json:"label"`
-	PlusID             any      `json:"plus_id"`
-	Ratio              any      `json:"ratio"`
-	Region             any      `json:"region"`
-	RetainIndefinitely bool     `json:"retain_indefinitely"`
-	StartTime          float64  `json:"start_time"`
-	SubLabel           any      `json:"sub_label"`
-	Thumbnail          string   `json:"thumbnail"`
-	TopScore           float64  `json:"top_score"`
-	Zones              []string `json:"zones"`
+	Area               any     `json:"area"`
+	Box                any     `json:"box"`
+	Camera             string  `json:"camera"`
+	EndTime            float64 `json:"end_time"`
+	FalsePositive      any     `json:"false_positive"`
+	HasClip            bool    `json:"has_clip"`
+	HasSnapshot        bool    `json:"has_snapshot"`
+	ID                 string  `json:"id"`
+	Label              string  `json:"label"`
+	PlusID             any     `json:"plus_id"`
+	Ratio              any     `json:"ratio"`
+	Region             any     `json:"region"`
+	RetainIndefinitely bool    `json:"retain_indefinitely"`
+	StartTime          float64 `json:"start_time"`
+	SubLabel           any     `json:"sub_label"`
+	Thumbnail          string  `json:"thumbnail"`
+	TopScore           float64 `json:"top_score"`
+	Zones              []any   `json:"zones"`
 }
 
 var Events EventsStruct
 var Event EventStruct
+
+func GETZones(Zones []any) []string {
+	var my_zones []string
+	for _, zone := range Zones {
+		my_zones = append(my_zones, zone.(string))
+	}
+	return my_zones
+}
 
 func ErrorSend(TextError string, bot *tgbotapi.BotAPI) {
 	conf := config.New()
@@ -194,7 +202,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	}
 	text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.TopScore*100)) + "%`\n"
 	text = text + "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
-	text = text + "┣*Zones*\n┗ `" + strings.Join(FrigateEvent.Zones, ", ") + "`\n"
+	text = text + "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
 	text = text + "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label
 
 	// Save thumbnail
