@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/oldtyt/frigate-telegram/internal/config"
@@ -41,24 +42,24 @@ type EventsStruct []struct {
 }
 
 type EventStruct struct {
-	Area               any     `json:"area"`
-	Box                any     `json:"box"`
-	Camera             string  `json:"camera"`
-	EndTime            float64 `json:"end_time"`
-	FalsePositive      any     `json:"false_positive"`
-	HasClip            bool    `json:"has_clip"`
-	HasSnapshot        bool    `json:"has_snapshot"`
-	ID                 string  `json:"id"`
-	Label              string  `json:"label"`
-	PlusID             any     `json:"plus_id"`
-	Ratio              any     `json:"ratio"`
-	Region             any     `json:"region"`
-	RetainIndefinitely bool    `json:"retain_indefinitely"`
-	StartTime          float64 `json:"start_time"`
-	SubLabel           any     `json:"sub_label"`
-	Thumbnail          string  `json:"thumbnail"`
-	TopScore           float64 `json:"top_score"`
-	Zones              []any   `json:"zones"`
+	Area               any      `json:"area"`
+	Box                any      `json:"box"`
+	Camera             string   `json:"camera"`
+	EndTime            float64  `json:"end_time"`
+	FalsePositive      any      `json:"false_positive"`
+	HasClip            bool     `json:"has_clip"`
+	HasSnapshot        bool     `json:"has_snapshot"`
+	ID                 string   `json:"id"`
+	Label              string   `json:"label"`
+	PlusID             any      `json:"plus_id"`
+	Ratio              any      `json:"ratio"`
+	Region             any      `json:"region"`
+	RetainIndefinitely bool     `json:"retain_indefinitely"`
+	StartTime          float64  `json:"start_time"`
+	SubLabel           any      `json:"sub_label"`
+	Thumbnail          string   `json:"thumbnail"`
+	TopScore           float64  `json:"top_score"`
+	Zones              []string `json:"zones"`
 }
 
 var Events EventsStruct
@@ -154,7 +155,7 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 
 	// Sleep for wait full save videos
 	time.Sleep(time.Duration(conf.SleepTime) * time.Second)
-	
+
 	// Download clip file
 	resp, err := http.Get(ClipURL)
 	if err != nil {
@@ -193,6 +194,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	}
 	text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.TopScore*100)) + "%`\n"
 	text = text + "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
+	text = text + "┣*Zones*\n┗ `" + strings.Join(FrigateEvent.Zones, ", ") + "`\n"
 	text = text + "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label
 
 	// Save thumbnail
