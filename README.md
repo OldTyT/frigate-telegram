@@ -31,10 +31,10 @@ docker compose up -d
 | ----------- | ----------- | ----------- |
 | `TELEGRAM_BOT_TOKEN` | `""`| Token for telegram bot. |
 | `FRIGATE_URL` | `http://localhost:5000` | Internal link in frigate. |
-| `FRIGATE_EVENT_LIMIT` | `3`| 	Limit the number of events returned. |
+| `FRIGATE_EVENT_LIMIT` | `20`| 	Limit the number of events returned. |
 | `DEBUG` | `False` | Debug mode. |
 | `TELEGRAM_CHAT_ID` | `0` | Telegram chat id. |
-| `SLEEP_TIME`| `30` | Sleep time after cycle, in second. |
+| `SLEEP_TIME`| `5` | Sleep time after cycle, in second. |
 | `FRIGATE_EXTERNAL_URL` | `http://localhost:5000` | External link in frigate(need for generate link in message). |
 | `TZ` | `""` | Timezone |
 | `REDIS_ADDR` | `localhost:6379` | IP and port redis |
@@ -42,4 +42,4 @@ docker compose up -d
 | `REDIS_DB` | `0` | Redis DB |
 | `REDIS_PROTOCOL` | `3` | Redis protocol |
 | `REDIS_TTL` | `1209600` | Redis TTL for key event(in seconds) |
-| `TIME_WAIT_SAVE` | `60` | Wait for fully video event created(in seconds) |
+| `TIME_WAIT_SAVE` | `30` | Wait for fully video event created(in seconds) |

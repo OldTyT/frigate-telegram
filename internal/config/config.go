@@ -39,7 +39,7 @@ func New() *Config {
 		RedisDB:            getEnvAsInt("REDIS_DB", 0),
 		RedisProtocol:      getEnvAsInt("REDIS_PROTOCOL", 3),
 		RedisTTL:           getEnvAsInt("REDIS_TTL", 1209600), // 7 days
-		TimeWaitSave:       getEnvAsInt("TIME_WAIT_SAVE", 60), // 5 seconds
+		TimeWaitSave:       getEnvAsInt("TIME_WAIT_SAVE", 30),
 	}
 }
 
