@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -36,7 +37,7 @@ type EventsStruct []struct {
 	StartTime          float64 `json:"start_time"`
 	SubLabel           any     `json:"sub_label"`
 	Thumbnail          string  `json:"thumbnail"`
-	TopScore           float64 `json:"top_score"`
+	TopScore           any     `json:"top_score"`
 	Zones              []any   `json:"zones"`
 }
 
@@ -57,12 +58,14 @@ type EventStruct struct {
 	StartTime          float64 `json:"start_time"`
 	SubLabel           any     `json:"sub_label"`
 	Thumbnail          string  `json:"thumbnail"`
-	TopScore           float64 `json:"top_score"`
+	TopScore           any     `json:"top_score"`
 	Zones              []any   `json:"zones"`
 }
 
 var Events EventsStruct
 var Event EventStruct
+var floatType = reflect.TypeOf(float64(0))
+var stringType = reflect.TypeOf("")
 
 func GETZones(Zones []any) []string {
 	var my_zones []string
@@ -184,7 +187,6 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 }
 
 func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
-	log.Info.Println("Found new event. ID - ", FrigateEvent.ID)
 	// Get config
 	conf := config.New()
 
@@ -202,7 +204,9 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		t_end := time.Unix(int64(FrigateEvent.EndTime), 0)
 		text = text + fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
 	}
-	text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.TopScore*100)) + "%`\n"
+	if TopScore, ok := FrigateEvent.TopScore.(float64); ok {
+		text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (TopScore)) + "%`\n"
+	}
 	text = text + "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
 	text = text + "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
 	text = text + "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",")
