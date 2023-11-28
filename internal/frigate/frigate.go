@@ -21,45 +21,55 @@ import (
 )
 
 type EventsStruct []struct {
-	Area               any     `json:"area"`
-	Box                any     `json:"box"`
-	Camera             string  `json:"camera"`
-	EndTime            float64 `json:"end_time"`
-	FalsePositive      any     `json:"false_positive"`
-	HasClip            bool    `json:"has_clip"`
-	HasSnapshot        bool    `json:"has_snapshot"`
-	ID                 string  `json:"id"`
-	Label              string  `json:"label"`
-	PlusID             any     `json:"plus_id"`
-	Ratio              any     `json:"ratio"`
-	Region             any     `json:"region"`
-	RetainIndefinitely bool    `json:"retain_indefinitely"`
-	StartTime          float64 `json:"start_time"`
-	SubLabel           any     `json:"sub_label"`
-	Thumbnail          string  `json:"thumbnail"`
-	TopScore           any     `json:"top_score"`
-	Zones              []any   `json:"zones"`
+	Box    interface{} `json:"box"`
+	Camera string      `json:"camera"`
+	Data   struct {
+		Attributes []interface{} `json:"attributes"`
+		Box        []float64     `json:"box"`
+		Region     []float64     `json:"region"`
+		Score      float64       `json:"score"`
+		TopScore   float64       `json:"top_score"`
+		Type       string        `json:"type"`
+	} `json:"data"`
+	EndTime            float64     `json:"end_time"`
+	FalsePositive      interface{} `json:"false_positive"`
+	HasClip            bool        `json:"has_clip"`
+	HasSnapshot        bool        `json:"has_snapshot"`
+	ID                 string      `json:"id"`
+	Label              string      `json:"label"`
+	PlusID             interface{} `json:"plus_id"`
+	RetainIndefinitely bool        `json:"retain_indefinitely"`
+	StartTime          float64     `json:"start_time"`
+	SubLabel           interface{} `json:"sub_label"`
+	Thumbnail          string      `json:"thumbnail"`
+	TopScore           interface{} `json:"top_score"`
+	Zones              []any       `json:"zones"`
 }
 
 type EventStruct struct {
-	Area               any     `json:"area"`
-	Box                any     `json:"box"`
-	Camera             string  `json:"camera"`
-	EndTime            float64 `json:"end_time"`
-	FalsePositive      any     `json:"false_positive"`
-	HasClip            bool    `json:"has_clip"`
-	HasSnapshot        bool    `json:"has_snapshot"`
-	ID                 string  `json:"id"`
-	Label              string  `json:"label"`
-	PlusID             any     `json:"plus_id"`
-	Ratio              any     `json:"ratio"`
-	Region             any     `json:"region"`
-	RetainIndefinitely bool    `json:"retain_indefinitely"`
-	StartTime          float64 `json:"start_time"`
-	SubLabel           any     `json:"sub_label"`
-	Thumbnail          string  `json:"thumbnail"`
-	TopScore           any     `json:"top_score"`
-	Zones              []any   `json:"zones"`
+	Box    interface{} `json:"box"`
+	Camera string      `json:"camera"`
+	Data   struct {
+		Attributes []interface{} `json:"attributes"`
+		Box        []float64     `json:"box"`
+		Region     []float64     `json:"region"`
+		Score      float64       `json:"score"`
+		TopScore   float64       `json:"top_score"`
+		Type       string        `json:"type"`
+	} `json:"data"`
+	EndTime            float64     `json:"end_time"`
+	FalsePositive      interface{} `json:"false_positive"`
+	HasClip            bool        `json:"has_clip"`
+	HasSnapshot        bool        `json:"has_snapshot"`
+	ID                 string      `json:"id"`
+	Label              string      `json:"label"`
+	PlusID             interface{} `json:"plus_id"`
+	RetainIndefinitely bool        `json:"retain_indefinitely"`
+	StartTime          float64     `json:"start_time"`
+	SubLabel           interface{} `json:"sub_label"`
+	Thumbnail          string      `json:"thumbnail"`
+	TopScore           interface{} `json:"top_score"`
+	Zones              []any       `json:"zones"`
 }
 
 var Events EventsStruct
@@ -204,9 +214,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		t_end := time.Unix(int64(FrigateEvent.EndTime), 0)
 		text = text + fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
 	}
-	if TopScore, ok := FrigateEvent.TopScore.(float64); ok {
-		text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (TopScore)) + "%`\n"
-	}
+	text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
 	text = text + "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
 	text = text + "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
 	text = text + "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",")
