@@ -41,4 +41,5 @@ docker compose up -d
 | `REDIS_PASSWORD` | `""` | Redis password |
 | `REDIS_DB` | `0` | Redis DB |
 | `REDIS_PROTOCOL` | `3` | Redis protocol |
-| `REDIS_TTL` | `604800` | Redis TTL for key event(in seconds.) |
+| `REDIS_TTL` | `1209600` | Redis TTL for key event(in seconds) |
+| `TIME_WAIT_SAVE` | `60` | Wait for fully video event created(in seconds) |

@@ -57,9 +57,12 @@ func main() {
 	log.LogFunc()
 	// Get config
 	conf := config.New()
-	log.Info.Println("Starting frigate-telegram.")
-	log.Info.Println("Version:      " + config.Version)
-	log.Info.Println("Frigate URL:  " + conf.FrigateURL)
+
+	// Prepare startup msg
+	startup_msg := "Starting frigate-telegram.\n"
+	startup_msg += "Version:      " + config.Version + "\n"
+	startup_msg += "Frigate URL:  " + conf.FrigateURL + "\n"
+	log.Info.Println(startup_msg)
 
 	// Initializing telegram bot
 	bot, err := tgbotapi.NewBotAPI(conf.TelegramBotToken)
@@ -69,16 +72,21 @@ func main() {
 	bot.Debug = conf.Debug
 	log.Info.Println("Authorized on account " + bot.Self.UserName)
 
-	FrigateEventsURL := conf.FrigateURL + "/api/events"
+	// Send startup msg.
+	_, errmsg := bot.Send(tgbotapi.NewMessage(conf.TelegramChatID, startup_msg))
+	if errmsg != nil {
+		log.Error.Println(errmsg.Error())
+	}
 
 	// Starting ping command handler(healthcheck)
 	go PongBot(bot)
+
+	FrigateEventsURL := conf.FrigateURL + "/api/events"
 
 	// Starting loop for getting events from Frigate
 	for true {
 		FrigateEvents := frigate.GetEvents(FrigateEventsURL, bot)
 		frigate.ParseEvents(FrigateEvents, bot)
-
 		time.Sleep(time.Duration(conf.SleepTime) * time.Second)
 		log.Debug.Println("Sleeping for " + strconv.Itoa(conf.SleepTime) + " seconds.")
 	}

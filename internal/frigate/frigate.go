@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
@@ -82,7 +81,7 @@ func ErrorSend(TextError string, bot *tgbotapi.BotAPI) {
 	log.Error.Fatalln(TextError)
 }
 
-func SaveThumbnail(Thumbnail string, bot *tgbotapi.BotAPI) string {
+func SaveThumbnail(EventID string, Thumbnail string, bot *tgbotapi.BotAPI) string {
 	// Decode string Thumbnail base64
 	dec, err := base64.StdEncoding.DecodeString(Thumbnail)
 	if err != nil {
@@ -90,7 +89,7 @@ func SaveThumbnail(Thumbnail string, bot *tgbotapi.BotAPI) string {
 	}
 
 	// Generate uniq filename
-	filename := "/tmp/" + strconv.FormatInt(int64(rand.Intn(10000000000)), 10) + ".jpg"
+	filename := "/tmp/" + EventID + ".jpg"
 	f, err := os.Create(filename)
 	if err != nil {
 		ErrorSend("Error when create file: "+err.Error(), bot)
@@ -152,7 +151,10 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 	ClipURL := conf.FrigateURL + "/api/events/" + EventID + "/clip.mp4"
 
 	// Generate uniq filename
-	filename := "/tmp/" + strconv.FormatInt(int64(rand.Intn(10000000000)), 10) + ".mp4"
+	filename := "/tmp/" + EventID + ".mp4"
+
+	// Sleep for wait full save videos
+	time.Sleep(time.Duration(conf.TimeWaitSave) * time.Second)
 
 	// Create clip file
 	f, err := os.Create(filename)
@@ -160,9 +162,6 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 		ErrorSend("Error when create file: "+err.Error(), bot)
 	}
 	defer f.Close()
-
-	// Sleep for wait full save videos
-	time.Sleep(time.Duration(conf.SleepTime) * time.Second)
 
 	// Download clip file
 	resp, err := http.Get(ClipURL)
@@ -185,6 +184,8 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 }
 
 func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
+	redis.AddNewEvent(FrigateEvent.ID, "InWork", time.Duration(5)*time.Minute)
+	log.Info.Println("Found new event. ID - ", FrigateEvent.ID)
 	// Get config
 	conf := config.New()
 
@@ -200,12 +201,13 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		t_end := time.Unix(int64(FrigateEvent.EndTime), 0)
 		text = text + fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
 	}
+	text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.TopScore*100)) + "%`\n"
 	text = text + "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
 	text = text + "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
-	text = text + "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label
+	text = text + "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",")
 
 	// Save thumbnail
-	FilePathThumbnail := SaveThumbnail(FrigateEvent.Thumbnail, bot)
+	FilePathThumbnail := SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
 	defer os.Remove(FilePathThumbnail)
 
 	var medias []interface{}
@@ -242,15 +244,14 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	if FrigateEvent.EndTime != 0 {
 		State = "Finished"
 	}
-	go redis.AddNewEvent(FrigateEvent.ID, State)
+	redis.AddNewEvent(FrigateEvent.ID, State, time.Duration(conf.RedisTTL)*time.Second)
 }
 
 func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI) {
 	// Parse events
 	for Event := range FrigateEvents {
 		if redis.CheckEvent(FrigateEvents[Event].ID) {
-			log.Info.Println("Found new event. ID - ", FrigateEvents[Event].ID)
-			SendMessageEvent(FrigateEvents[Event], bot)
+			go SendMessageEvent(FrigateEvents[Event], bot)
 		}
 	}
 }

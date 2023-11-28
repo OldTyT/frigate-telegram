@@ -18,8 +18,7 @@ var rdb = redis.NewClient(&redis.Options{
 	Protocol: conf.RedisProtocol, // specify 2 for RESP 2 or 3 for RESP 3
 })
 
-func AddNewEvent(EventID string, State string) {
-	RedisTTL := time.Duration(conf.RedisTTL) * time.Second
+func AddNewEvent(EventID string, State string, RedisTTL time.Duration) {
 	err := rdb.Set(ctx, EventID, State, RedisTTL).Err()
 	if err != nil {
 		log.Error.Fatalln(err)
@@ -40,6 +39,9 @@ func CheckEvent(EventID string) bool {
 	}
 	if val == "InProgress" {
 		return true
+	}
+	if val == "InWork" {
+		return false
 	}
 	return false
 }
