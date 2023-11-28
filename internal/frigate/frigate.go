@@ -184,10 +184,11 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 }
 
 func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
-	redis.AddNewEvent(FrigateEvent.ID, "InWork", time.Duration(5)*time.Minute)
 	log.Info.Println("Found new event. ID - ", FrigateEvent.ID)
 	// Get config
 	conf := config.New()
+
+	redis.AddNewEvent(FrigateEvent.ID, "InWork", time.Duration(conf.TimeWaitSave*3)*time.Second)
 
 	// Prepare text message
 	text := "*Event*\n"
