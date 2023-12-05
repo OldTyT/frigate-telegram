@@ -21,7 +21,8 @@ type Config struct {
 	RedisDB            int
 	RedisProtocol      int
 	RedisTTL           int
-	TimeWaitSave       int
+	WatchDogSleepTime  int
+	EventBeforeSeconds int
 }
 
 // New returns a new Config struct
@@ -33,13 +34,14 @@ func New() *Config {
 		Debug:              getEnvAsBool("DEBUG", false),
 		TelegramChatID:     getEnvAsInt64("TELEGRAM_CHAT_ID", 0),
 		SleepTime:          getEnvAsInt("SLEEP_TIME", 5),
+		WatchDogSleepTime:  getEnvAsInt("WATCH_DOG_SLEEP_TIME", 3),
 		FrigateExternalURL: getEnv("FRIGATE_EXTERNAL_URL", "http://localhost:5000"),
 		RedisAddr:          getEnv("REDIS_ADDR", "localhost:6379"),
 		RedisPassword:      getEnv("REDIS_PASSWORD", ""),
 		RedisDB:            getEnvAsInt("REDIS_DB", 0),
 		RedisProtocol:      getEnvAsInt("REDIS_PROTOCOL", 3),
 		RedisTTL:           getEnvAsInt("REDIS_TTL", 1209600), // 7 days
-		TimeWaitSave:       getEnvAsInt("TIME_WAIT_SAVE", 30),
+		EventBeforeSeconds: getEnvAsInt("EVENT_BEFORE_SECONDS", 300),
 	}
 }
 

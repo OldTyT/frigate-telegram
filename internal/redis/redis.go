@@ -40,6 +40,9 @@ func CheckEvent(EventID string) bool {
 	if val == "InProgress" {
 		return true
 	}
+	if val == "Finished" {
+		return false
+	}
 	if val == "InWork" {
 		return false
 	}

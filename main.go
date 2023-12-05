@@ -83,10 +83,11 @@ func main() {
 
 	FrigateEventsURL := conf.FrigateURL + "/api/events"
 
+	go frigate.NotifyEvents(bot, FrigateEventsURL)
 	// Starting loop for getting events from Frigate
 	for true {
-		FrigateEvents := frigate.GetEvents(FrigateEventsURL, bot)
-		frigate.ParseEvents(FrigateEvents, bot)
+		FrigateEvents := frigate.GetEvents(FrigateEventsURL, bot, false)
+		frigate.ParseEvents(FrigateEvents, bot, false)
 		time.Sleep(time.Duration(conf.SleepTime) * time.Second)
 		log.Debug.Println("Sleeping for " + strconv.Itoa(conf.SleepTime) + " seconds.")
 	}

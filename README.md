@@ -43,3 +43,5 @@ docker compose up -d
 | `REDIS_PROTOCOL` | `3` | Redis protocol |
 | `REDIS_TTL` | `1209600` | Redis TTL for key event(in seconds) |
 | `TIME_WAIT_SAVE` | `30` | Wait for fully video event created(in seconds) |
+| `WATCH_DOG_SLEEP_TIME` | `3` | Sleep watch dog goroutine seconds |
+| `EVENT_BEFORE_SECONDS` | `300` | Send event before seconds |
