@@ -124,7 +124,7 @@ func GetEvents(FrigateURL string, bot *tgbotapi.BotAPI, SetBefore bool) EventsSt
 	FrigateURL = FrigateURL + "?limit=" + strconv.Itoa(conf.FrigateEventLimit)
 
 	if SetBefore {
-		timestamp := time.Now().UTC().UnixNano()
+		timestamp := time.Now().UTC().Unix()
 		timestamp = timestamp - int64(conf.EventBeforeSeconds)
 		FrigateURL = FrigateURL + "&before=" + strconv.FormatInt(timestamp, 10)
 	}
