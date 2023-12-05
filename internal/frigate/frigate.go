@@ -208,20 +208,21 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 
 	// Prepare text message
 	text := "*Event*\n"
-	text = text + "┣*Camera*\n┗ `" + FrigateEvent.Camera + "`\n"
-	text = text + "┣*Label*\n┗ `" + FrigateEvent.Label + "`\n"
+	text += "┣*Camera*\n┗ `" + FrigateEvent.Camera + "`\n"
+	text += "┣*Label*\n┗ `" + FrigateEvent.Label + "`\n"
 	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
-	text = text + fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
+	text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
 	if FrigateEvent.EndTime == 0 {
-		text = text + "┣*End time*\n┗ `In progess`" + "\n"
+		text += "┣*End time*\n┗ `In progess`" + "\n"
 	} else {
 		t_end := time.Unix(int64(FrigateEvent.EndTime), 0)
-		text = text + fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
+		text += fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
 	}
-	text = text + fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
-	text = text + "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
-	text = text + "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
-	text = text + "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",")
+	text += fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
+	text += "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
+	text += "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
+	text += "[Events URL](" + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",") + ")\n"
+	text += "[General URL](" + conf.FrigateExternalURL
 
 	// Save thumbnail
 	FilePathThumbnail := SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
