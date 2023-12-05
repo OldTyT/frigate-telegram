@@ -264,11 +264,15 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	redis.AddNewEvent(FrigateEvent.ID, State, time.Duration(conf.RedisTTL)*time.Second)
 }
 
-func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI, Telegram bool) {
+func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI, WatchDog bool) {
 	// Parse events
+	RedisKeyPrefix := ""
+	if WatchDog {
+		RedisKeyPrefix = "WatchDog_"
+	}
 	for Event := range FrigateEvents {
-		if redis.CheckEvent("WatchDog" + FrigateEvents[Event].ID) {
-			if Telegram {
+		if redis.CheckEvent(RedisKeyPrefix + FrigateEvents[Event].ID) {
+			if WatchDog {
 				SendTextEvent(FrigateEvents[Event], bot)
 			} else {
 				go SendMessageEvent(FrigateEvents[Event], bot)
@@ -294,7 +298,7 @@ func SendTextEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	if err != nil {
 		log.Error.Println(err.Error())
 	}
-	redis.AddNewEvent("WatchDog"+FrigateEvent.ID, "Finished", time.Duration(conf.RedisTTL)*time.Second)
+	redis.AddNewEvent("WatchDog_"+FrigateEvent.ID, "Finished", time.Duration(conf.RedisTTL)*time.Second)
 }
 
 func NotifyEvents(bot *tgbotapi.BotAPI, FrigateEventsURL string) {
