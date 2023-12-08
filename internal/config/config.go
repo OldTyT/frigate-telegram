@@ -23,6 +23,7 @@ type Config struct {
 	RedisTTL           int
 	WatchDogSleepTime  int
 	EventBeforeSeconds int
+	SendTextEvent      bool
 }
 
 // New returns a new Config struct
@@ -42,6 +43,7 @@ func New() *Config {
 		RedisProtocol:      getEnvAsInt("REDIS_PROTOCOL", 3),
 		RedisTTL:           getEnvAsInt("REDIS_TTL", 1209600), // 7 days
 		EventBeforeSeconds: getEnvAsInt("EVENT_BEFORE_SECONDS", 300),
+		SendTextEvent:      getEnvAsBool("SEND_TEXT_EVENT", false),
 	}
 }
 
