@@ -309,7 +309,7 @@ func SendTextEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 
 func NotifyEvents(bot *tgbotapi.BotAPI, FrigateEventsURL string) {
 	conf := config.New()
-	for true {
+	for {
 		FrigateEvents := GetEvents(FrigateEventsURL, bot, false)
 		ParseEvents(FrigateEvents, bot, true)
 		time.Sleep(time.Duration(conf.WatchDogSleepTime) * time.Second)

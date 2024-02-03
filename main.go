@@ -90,7 +90,7 @@ func main() {
 		go frigate.NotifyEvents(bot, FrigateEventsURL)
 	}
 	// Starting loop for getting events from Frigate
-	for true {
+	for {
 		FrigateEvents := frigate.GetEvents(FrigateEventsURL, bot, true)
 		frigate.ParseEvents(FrigateEvents, bot, false)
 		time.Sleep(time.Duration(conf.SleepTime) * time.Second)
