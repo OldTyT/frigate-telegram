@@ -222,7 +222,8 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text += "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
 	text += "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
 	text += "[Events URL](" + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",") + ")\n"
-	text += "[General URL](" + conf.FrigateExternalURL
+	text += "[General URL](" + conf.FrigateExternalURL + "\n"
+	text += "[Source clip](" + conf.FrigateExternalURL + "/api/events/" + FrigateEvent.ID + "/clip.mp4)\n"
 
 	// Save thumbnail
 	FilePathThumbnail := SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
@@ -239,9 +240,17 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		FilePathClip := SaveClip(FrigateEvent.ID, bot)
 		defer os.Remove(FilePathClip)
 
-		// Add clip to media group
-		MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
-		medias = append(medias, MediaClip)
+		videoInfo, err := os.Stat(FilePathClip)
+		if err != nil {
+			ErrorSend("Error receiving information about the clip file: ", err)
+		}
+
+		if videoInfo.Size() < 52428800 {
+			// Telegram don't send large file see for more: https://github.com/OldTyT/frigate-telegram/issues/5
+			// Add clip to media group
+			MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
+			medias = append(medias, MediaClip)
+		}
 	}
 
 	// Create message

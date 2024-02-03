@@ -60,7 +60,7 @@ func main() {
 
 	// Prepare startup msg
 	startup_msg := "Starting frigate-telegram.\n"
-	startup_msg += "Version:      " + config.Version + "\n"
+	// startup_msg += "Version:      " + config.Version + "\n"
 	startup_msg += "Frigate URL:  " + conf.FrigateURL + "\n"
 	log.Info.Println(startup_msg)
 
