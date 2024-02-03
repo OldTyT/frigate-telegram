@@ -217,9 +217,10 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text += fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
 	text += "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
 	text += "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
-	text += "[Events URL](" + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",") + ")\n"
-	text += "[General URL](" + conf.FrigateExternalURL + "\n"
-	text += "[Source clip](" + conf.FrigateExternalURL + "/api/events/" + FrigateEvent.ID + "/clip.mp4)\n"
+	text += "*URLs*\n"
+	text += "┣[Events](" + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",") + ")\n"
+	text += "┣[General](" + conf.FrigateExternalURL + ")\n"
+	text += "┗[Source clip](" + conf.FrigateExternalURL + "/api/events/" + FrigateEvent.ID + "/clip.mp4)\n"
 
 	// Save thumbnail
 	FilePathThumbnail := SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
