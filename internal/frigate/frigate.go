@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -73,8 +72,6 @@ type EventStruct struct {
 
 var Events EventsStruct
 var Event EventStruct
-var floatType = reflect.TypeOf(float64(0))
-var stringType = reflect.TypeOf("")
 
 func GETZones(Zones []any) []string {
 	var my_zones []string

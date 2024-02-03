@@ -10,9 +10,13 @@ import (
 	"github.com/oldtyt/frigate-telegram/internal/log"
 )
 
+// FrigateEvents is frigate events struct
 var FrigateEvents frigate.EventsStruct
+
+// FrigateEvent is frigate event struct
 var FrigateEvent frigate.EventStruct
 
+// PongBot is needed to check the work of the bot.
 func PongBot(bot *tgbotapi.BotAPI) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
@@ -59,10 +63,9 @@ func main() {
 	conf := config.New()
 
 	// Prepare startup msg
-	startup_msg := "Starting frigate-telegram.\n"
-	// startup_msg += "Version:      " + config.Version + "\n"
-	startup_msg += "Frigate URL:  " + conf.FrigateURL + "\n"
-	log.Info.Println(startup_msg)
+	startupMsg := "Starting frigate-telegram.\n"
+	startupMsg += "Frigate URL:  " + conf.FrigateURL + "\n"
+	log.Info.Println(startupMsg)
 
 	// Initializing telegram bot
 	bot, err := tgbotapi.NewBotAPI(conf.TelegramBotToken)
@@ -73,7 +76,7 @@ func main() {
 	log.Info.Println("Authorized on account " + bot.Self.UserName)
 
 	// Send startup msg.
-	_, errmsg := bot.Send(tgbotapi.NewMessage(conf.TelegramChatID, startup_msg))
+	_, errmsg := bot.Send(tgbotapi.NewMessage(conf.TelegramChatID, startupMsg))
 	if errmsg != nil {
 		log.Error.Println(errmsg.Error())
 	}

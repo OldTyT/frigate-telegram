@@ -5,8 +5,6 @@ import (
 	"strconv"
 )
 
-// const Version string = "v0.0.1"
-
 type Config struct {
 	Debug              bool
 	TelegramBotToken   string
