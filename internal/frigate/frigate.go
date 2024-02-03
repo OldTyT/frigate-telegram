@@ -5,10 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -74,8 +72,6 @@ type EventStruct struct {
 
 var Events EventsStruct
 var Event EventStruct
-var floatType = reflect.TypeOf(float64(0))
-var stringType = reflect.TypeOf("")
 
 func GETZones(Zones []any) []string {
 	var my_zones []string
@@ -144,7 +140,7 @@ func GetEvents(FrigateURL string, bot *tgbotapi.BotAPI, SetBefore bool) EventsSt
 	}
 
 	// Read data from response
-	byteValue, err := ioutil.ReadAll(resp.Body)
+	byteValue, err := io.ReadAll(resp.Body)
 	if err != nil {
 		ErrorSend("Can't read JSON: "+err.Error(), bot, "ALL")
 	}
@@ -222,7 +218,8 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text += "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
 	text += "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
 	text += "[Events URL](" + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",") + ")\n"
-	text += "[General URL](" + conf.FrigateExternalURL
+	text += "[General URL](" + conf.FrigateExternalURL + "\n"
+	text += "[Source clip](" + conf.FrigateExternalURL + "/api/events/" + FrigateEvent.ID + "/clip.mp4)\n"
 
 	// Save thumbnail
 	FilePathThumbnail := SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
@@ -239,9 +236,17 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		FilePathClip := SaveClip(FrigateEvent.ID, bot)
 		defer os.Remove(FilePathClip)
 
-		// Add clip to media group
-		MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
-		medias = append(medias, MediaClip)
+		videoInfo, err := os.Stat(FilePathClip)
+		if err != nil {
+			ErrorSend("Error receiving information about the clip file: "+err.Error(), bot, FrigateEvent.ID)
+		}
+
+		if videoInfo.Size() < 52428800 {
+			// Telegram don't send large file see for more: https://github.com/OldTyT/frigate-telegram/issues/5
+			// Add clip to media group
+			MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
+			medias = append(medias, MediaClip)
+		}
 	}
 
 	// Create message
@@ -304,7 +309,7 @@ func SendTextEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 
 func NotifyEvents(bot *tgbotapi.BotAPI, FrigateEventsURL string) {
 	conf := config.New()
-	for true {
+	for {
 		FrigateEvents := GetEvents(FrigateEventsURL, bot, false)
 		ParseEvents(FrigateEvents, bot, true)
 		time.Sleep(time.Duration(conf.WatchDogSleepTime) * time.Second)

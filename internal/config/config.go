@@ -3,10 +3,7 @@ package config
 import (
 	"os"
 	"strconv"
-	"strings"
 )
-
-const Version string = "v0.0.1"
 
 type Config struct {
 	Debug              bool
@@ -87,14 +84,14 @@ func getEnvAsBool(name string, defaultVal bool) bool {
 }
 
 // Helper to read an environment variable into a string slice or return default value
-func getEnvAsSlice(name string, defaultVal []string, sep string) []string {
-	valStr := getEnv(name, "")
+// func getEnvAsSlice(name string, defaultVal []string, sep string) []string {
+// 	valStr := getEnv(name, "")
 
-	if valStr == "" {
-		return defaultVal
-	}
+// 	if valStr == "" {
+// 		return defaultVal
+// 	}
 
-	val := strings.Split(valStr, sep)
+// 	val := strings.Split(valStr, sep)
 
-	return val
-}
+// 	return val
+// }
