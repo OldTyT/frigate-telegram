@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"reflect"
@@ -144,7 +143,7 @@ func GetEvents(FrigateURL string, bot *tgbotapi.BotAPI, SetBefore bool) EventsSt
 	}
 
 	// Read data from response
-	byteValue, err := ioutil.ReadAll(resp.Body)
+	byteValue, err := io.ReadAll(resp.Body)
 	if err != nil {
 		ErrorSend("Can't read JSON: "+err.Error(), bot, "ALL")
 	}
@@ -242,7 +241,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 
 		videoInfo, err := os.Stat(FilePathClip)
 		if err != nil {
-			ErrorSend("Error receiving information about the clip file: ", err)
+			ErrorSend("Error receiving information about the clip file: "+err.Error(), bot, FrigateEvent.ID)
 		}
 
 		if videoInfo.Size() < 52428800 {
