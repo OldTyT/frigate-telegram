@@ -8,8 +8,8 @@ on:
 
 
 jobs:
-  build:
-    name: Build & Push
+  build_amd64:
+    name: "[amd64] Build & Push"
     runs-on: ubuntu-latest
     env:
       REPOSITORY_URL: ghcr.io
@@ -25,7 +25,9 @@ jobs:
         run: >-
           docker build
           -t $IMAGE_NAME
-          -t $REPOSITORY_URL/$IMAGE_NAME:latest .
+          -t $REPOSITORY_URL/$IMAGE_NAME:amd64-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
+          -t $REPOSITORY_URL/$IMAGE_NAME:latest
+          -f docker/amd64/Dockerfile .
       - name: Docker Login
         uses: docker/login-action@v3
         with:
@@ -35,3 +37,87 @@ jobs:
       - name: Publish Image
         id: docker-push
         run: docker push --all-tags $REPOSITORY_URL/$IMAGE_NAME
+  build_arm32v6:
+    name: "[arm32v6] Build & Push"
+    runs-on: ubuntu-latest
+    env:
+      REPOSITORY_URL: ghcr.io
+      IMAGE_NAME: oldtyt/frigate-telegram
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Variables
+        id: vars
+        run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
+      - name: Set arm32v6 platform
+        run: docker buildx create --platform linux/arm/v6 --name arm --use
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REPOSITORY_URL }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image
+        id: docker-build
+        run: >-
+          docker buildx build
+          --platform linux/arm/v6
+          -t $REPOSITORY_URL/$IMAGE_NAME:arm32v6-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
+          -t $REPOSITORY_URL/$IMAGE_NAME:arm32v6
+          -f docker/arm32v6/Dockerfile --push .
+  build_arm32v7:
+    name: "[arm32v7] Build & Push"
+    runs-on: ubuntu-latest
+    env:
+      REPOSITORY_URL: ghcr.io
+      IMAGE_NAME: oldtyt/frigate-telegram
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Variables
+        id: vars
+        run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
+      - name: Set arm32v7 platform
+        run: docker buildx create --platform linux/arm/v7 --name arm --use
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REPOSITORY_URL }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image
+        id: docker-build
+        run: >-
+          docker buildx build
+          --platform linux/arm/v7
+          -t $REPOSITORY_URL/$IMAGE_NAME:arm32v7-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
+          -t $REPOSITORY_URL/$IMAGE_NAME:arm32v7
+          -f docker/arm32v7/Dockerfile --push .
+  build_arm64v8:
+    name: "[arm64v8] Build & Push"
+    runs-on: ubuntu-latest
+    env:
+      REPOSITORY_URL: ghcr.io
+      IMAGE_NAME: oldtyt/frigate-telegram
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Variables
+        id: vars
+        run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
+      - name: Set arm64v8 platform
+        run: docker buildx create --platform linux/arm64/v8 --name arm --use
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REPOSITORY_URL }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image
+        id: docker-build
+        run: >-
+          docker buildx build
+          --platform linux/arm64/v8
+          -t $REPOSITORY_URL/$IMAGE_NAME:arm64v8-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
+          -t $REPOSITORY_URL/$IMAGE_NAME:arm64v8
+          -f docker/arm64v8/Dockerfile --push .
