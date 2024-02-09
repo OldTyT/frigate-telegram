@@ -53,7 +53,7 @@ jobs:
       - name: Build image
         id: docker-build
         run: >-
-          docker buildx create --platform linux/arm/v6 --name arm32v6 --use && \
+          docker buildx create --platform linux/arm/v6 --name arm32v6 --use
           docker buildx build
           --platform linux/arm/v6
           -t $IMAGE_NAME
@@ -84,7 +84,7 @@ jobs:
       - name: Build image
         id: docker-build
         run: >-
-          docker buildx create --platform linux/arm/v7 --name arm32v7 --use && \
+          docker buildx create --platform linux/arm/v7 --name arm32v7 --use
           docker buildx build
           --platform linux/arm/v7
           -t $IMAGE_NAME
@@ -115,7 +115,7 @@ jobs:
       - name: Build image
         id: docker-build
         run: >-
-          docker buildx create --platform linux/arm64/v8 --name arm64v8 --use && \
+          docker buildx create --platform linux/arm64/v8 --name arm64v8 --use
           docker buildx build
           --platform linux/arm64/v8
           -t $IMAGE_NAME
