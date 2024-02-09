@@ -50,10 +50,11 @@ jobs:
       - name: Variables
         id: vars
         run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
+      - name: Set arm32v6 platform
+        run: docker buildx create --platform linux/arm/v6 --name arm --use
       - name: Build image
         id: docker-build
         run: >-
-          docker buildx create --platform linux/arm/v6 --name arm32v6 --use
           docker buildx build
           --platform linux/arm/v6
           -t $IMAGE_NAME
@@ -81,10 +82,11 @@ jobs:
       - name: Variables
         id: vars
         run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
+      - name: Set arm32v7 platform
+        run: docker buildx create --platform linux/arm/v7 --name arm --use
       - name: Build image
         id: docker-build
         run: >-
-          docker buildx create --platform linux/arm/v7 --name arm32v7 --use
           docker buildx build
           --platform linux/arm/v7
           -t $IMAGE_NAME
@@ -112,10 +114,11 @@ jobs:
       - name: Variables
         id: vars
         run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
+      - name: Set arm64v8 platform
+        run: docker buildx create --platform linux/arm64/v8 --name arm --use
       - name: Build image
         id: docker-build
         run: >-
-          docker buildx create --platform linux/arm64/v8 --name arm64v8 --use
           docker buildx build
           --platform linux/arm64/v8
           -t $IMAGE_NAME
