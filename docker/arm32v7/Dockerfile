@@ -3,7 +3,9 @@ FROM arm32v7/golang:1.21.3-alpine3.18 AS builder
 WORKDIR $GOPATH/frigate-telegram
 COPY . $GOPATH/frigate-telegram
 
-RUN go build .
+RUN apk --no-cache add binutils && \
+    go build . && \
+    strip frigate-telegram
 
 FROM arm32v7/alpine:3.18
 
