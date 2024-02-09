@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - feature/build_arm
 
 
 jobs:
@@ -121,5 +120,4 @@ jobs:
           --platform linux/arm64/v8
           -t $REPOSITORY_URL/$IMAGE_NAME:arm64v8-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
           -t $REPOSITORY_URL/$IMAGE_NAME:arm64v8
-          -t $REPOSITORY_URL/$IMAGE_NAME:latest
           -f docker/arm64v8/Dockerfile --push .
