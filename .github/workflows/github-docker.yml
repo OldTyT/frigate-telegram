@@ -53,7 +53,8 @@ jobs:
       - name: Build image
         id: docker-build
         run: >-
-          docker build
+          docker buildx build
+          --platform linux/arm/v6
           -t $IMAGE_NAME
           -t $REPOSITORY_URL/$IMAGE_NAME:arm-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
           -t $REPOSITORY_URL/$IMAGE_NAME:arm
