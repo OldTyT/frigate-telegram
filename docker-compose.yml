@@ -12,7 +12,7 @@ services:
       - /data:/mnt/docker/redis/data
 
   frigate-telegram:
-    image: ghcr.io/oldtyt/frigate-telegram
+    image: ghcr.io/oldtyt/frigate-telegram:amd64
     restart: always
     networks: [net]
     environment:
