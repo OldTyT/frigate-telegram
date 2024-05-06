@@ -45,4 +45,6 @@ docker compose up -d
 | `TIME_WAIT_SAVE` | `30` | Wait for fully video event created(in seconds) |
 | `WATCH_DOG_SLEEP_TIME` | `3` | Sleep watch dog goroutine seconds |
 | `EVENT_BEFORE_SECONDS` | `300` | Send event before seconds |
-| `SEND_TEXT_EVENT` | 'False' | Send text event without media |
+| `SEND_TEXT_EVENT` | `False` | Send text event without media |
+| `FRIGATE_EXCLUDE_CAMERA` | `None` | List exclude frigate camera, separate `,` |
+| `FRIGATE_INCLUDE_CAMERA` | `All` | List Include frigate camera, separate `,` |
