@@ -1,0 +1,33 @@
+---
+version: '3'
+networks:
+  net:
+
+services:
+  redis:
+    image: redis:7.2.3-alpine3.18
+    networks: [net]
+    restart: always
+
+  frigate-telegram:
+    build:
+      context: .
+      dockerfile: docker/amd64/Dockerfile
+    restart: always
+    networks: [net]
+    environment:
+      TELEGRAM_BOT_TOKEN: $TELEGRAM_BOT_TOKEN
+      FRIGATE_URL: http://192.168.0.254:5000
+      FRIGATE_EVENT_LIMIT: 15
+      DEBUG: False
+      TELEGRAM_CHAT_ID: $TELEGRAM_CHAT_ID
+      SLEEP_TIME: 15
+      FRIGATE_EXTERNAL_URL: https://frigate.domain.com
+      TZ: Europe/Berlin
+      REDIS_ADDR: "redis:6379"
+      FRIGATE_INCLUDE_CAMERA: "HiWatch-04,HiWatch-02"
+    volumes:
+      - type: tmpfs # Optional
+        target: /tmp
+        tmpfs:
+          size: 10000000

@@ -271,13 +271,35 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	redis.AddNewEvent(FrigateEvent.ID, State, time.Duration(conf.RedisTTL)*time.Second)
 }
 
+func StringsContains(MyStr string, MySlice []string) bool {
+	for _, v := range MySlice {
+		if v == MyStr {
+			return true
+		}
+	}
+	return false
+}
+
 func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI, WatchDog bool) {
 	// Parse events
+	conf := config.New()
 	RedisKeyPrefix := ""
 	if WatchDog {
 		RedisKeyPrefix = "WatchDog_"
 	}
 	for Event := range FrigateEvents {
+		if !(len(conf.FrigateExcludeCamera) == 1 && conf.FrigateExcludeCamera[0] == "None") {
+			if StringsContains(FrigateEvents[Event].Camera, conf.FrigateExcludeCamera) {
+				log.Debug.Println("Skip event from camera: " + FrigateEvents[Event].Camera)
+				continue
+			}
+		}
+		if !(len(conf.FrigateIncludeCamera) == 1 && conf.FrigateIncludeCamera[0] == "All") {
+			if !(StringsContains(FrigateEvents[Event].Camera, conf.FrigateIncludeCamera)) {
+				log.Debug.Println("Skip event from camera: " + FrigateEvents[Event].Camera)
+				continue
+			}
+		}
 		if redis.CheckEvent(RedisKeyPrefix + FrigateEvents[Event].ID) {
 			if WatchDog {
 				SendTextEvent(FrigateEvents[Event], bot)
