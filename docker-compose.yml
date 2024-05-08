@@ -8,8 +8,13 @@ services:
     image: redis:7.2.3-alpine3.18
     networks: [net]
     restart: always
+    command:
+      - 'redis-server'
+      - '--save 900 1'
+      - '--save 300 10'
+      - '--save 60 100'
     volumes:
-      - /data:/mnt/docker/redis/data
+      - /mnt/docker/redis/data:/data
 
   frigate-telegram:
     image: ghcr.io/oldtyt/frigate-telegram:amd64
