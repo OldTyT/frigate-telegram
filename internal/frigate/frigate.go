@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -73,10 +74,26 @@ type EventStruct struct {
 var Events EventsStruct
 var Event EventStruct
 
+func NormalizeTagText(text string) string {
+	var alphabetCheck = regexp.MustCompile(`^[A-Za-z]+$`)
+	var NormalizedText []string
+	runes := []rune(text)
+	for i := 0; i < len(runes); i++ {
+		wordString := fmt.Sprintf("%c", runes[i])
+		if _, err := strconv.Atoi(wordString); err == nil {
+			NormalizedText = append(NormalizedText, wordString)
+		}
+		if alphabetCheck.MatchString(wordString) {
+			NormalizedText = append(NormalizedText, wordString)
+		}
+	}
+	return strings.Join(NormalizedText, "")
+}
+
 func GETZones(Zones []any) []string {
 	var my_zones []string
 	for _, zone := range Zones {
-		my_zones = append(my_zones, zone.(string))
+		my_zones = append(my_zones, NormalizeTagText(zone.(string)))
 	}
 	return my_zones
 }
@@ -204,8 +221,8 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 
 	// Prepare text message
 	text := "*Event*\n"
-	text += "┣*Camera*\n┗ #" + FrigateEvent.Camera + "\n"
-	text += "┣*Label*\n┗ #" + FrigateEvent.Label + "\n"
+	text += "┣*Camera*\n┗ #" + NormalizeTagText(FrigateEvent.Camera) + "\n"
+	text += "┣*Label*\n┗ #" + NormalizeTagText(FrigateEvent.Label) + "\n"
 	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
 	text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
 	if FrigateEvent.EndTime == 0 {
