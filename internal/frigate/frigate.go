@@ -105,7 +105,7 @@ func ErrorSend(TextError string, bot *tgbotapi.BotAPI, EventID string) {
 	if err != nil {
 		log.Error.Println(err.Error())
 	}
-	log.Error.Fatalln(TextError)
+	log.Error.Println(TextError)
 }
 
 func SaveThumbnail(EventID string, Thumbnail string, bot *tgbotapi.BotAPI) string {
