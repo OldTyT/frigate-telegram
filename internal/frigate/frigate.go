@@ -223,6 +223,9 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text := "*Event*\n"
 	text += "┣*Camera*\n┗ #" + NormalizeTagText(FrigateEvent.Camera) + "\n"
 	text += "┣*Label*\n┗ #" + NormalizeTagText(FrigateEvent.Label) + "\n"
+	if FrigateEvent.SubLabel != nil {
+		text += "┣*SubLabel*\n┗ #" + NormalizeTagText(fmt.Sprintf("%v", FrigateEvent.SubLabel)) + "\n"
+	}
 	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
 	text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
 	if FrigateEvent.EndTime == 0 {
