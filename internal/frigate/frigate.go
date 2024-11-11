@@ -39,7 +39,7 @@ type EventsStruct []struct {
 	PlusID             interface{} `json:"plus_id"`
 	RetainIndefinitely bool        `json:"retain_indefinitely"`
 	StartTime          float64     `json:"start_time"`
-	SubLabel           interface{} `json:"sub_label"`
+	SubLabel           []any       `json:"sub_label"`
 	Thumbnail          string      `json:"thumbnail"`
 	TopScore           interface{} `json:"top_score"`
 	Zones              []any       `json:"zones"`
@@ -65,7 +65,7 @@ type EventStruct struct {
 	PlusID             interface{} `json:"plus_id"`
 	RetainIndefinitely bool        `json:"retain_indefinitely"`
 	StartTime          float64     `json:"start_time"`
-	SubLabel           interface{} `json:"sub_label"`
+	SubLabel           []any       `json:"sub_label"`
 	Thumbnail          string      `json:"thumbnail"`
 	TopScore           interface{} `json:"top_score"`
 	Zones              []any       `json:"zones"`
@@ -90,12 +90,15 @@ func NormalizeTagText(text string) string {
 	return strings.Join(NormalizedText, "")
 }
 
-func GETZones(Zones []any) []string {
-	var my_zones []string
-	for _, zone := range Zones {
-		my_zones = append(my_zones, NormalizeTagText(zone.(string)))
+func GetTagList(Tags []any) []string {
+	var my_tags []string
+	for _, zone := range Tags {
+		fmt.Println(zone)
+		if zone != nil {
+			my_tags = append(my_tags, NormalizeTagText(zone.(string)))
+		}
 	}
-	return my_zones
+	return my_tags
 }
 
 func ErrorSend(TextError string, bot *tgbotapi.BotAPI, EventID string) {
@@ -224,7 +227,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text += "┣*Camera*\n┗ #" + NormalizeTagText(FrigateEvent.Camera) + "\n"
 	text += "┣*Label*\n┗ #" + NormalizeTagText(FrigateEvent.Label) + "\n"
 	if FrigateEvent.SubLabel != nil {
-		text += "┣*SubLabel*\n┗ #" + NormalizeTagText(fmt.Sprintf("%v", FrigateEvent.SubLabel)) + "\n"
+		text += "┣*SubLabel*\n┗ #" + strings.Join(GetTagList(FrigateEvent.SubLabel), ", #") + "\n"
 	}
 	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
 	text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
@@ -236,9 +239,9 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	}
 	text += fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
 	text += "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
-	text += "┣*Zones*\n┗ #" + strings.Join(GETZones(FrigateEvent.Zones), ", #") + "\n"
+	text += "┣*Zones*\n┗ #" + strings.Join(GetTagList(FrigateEvent.Zones), ", #") + "\n"
 	text += "*URLs*\n"
-	text += "┣[Events](" + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",") + ")\n"
+	text += "┣[Events](" + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GetTagList(FrigateEvent.Zones), ",") + ")\n"
 	text += "┣[General](" + conf.FrigateExternalURL + ")\n"
 	text += "┗[Source clip](" + conf.FrigateExternalURL + "/api/events/" + FrigateEvent.ID + "/clip.mp4)\n"
 
@@ -339,8 +342,8 @@ func SendTextEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
 	text += fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
 	text += "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
-	text += "┣*Zones*\n┗ `" + strings.Join(GETZones(FrigateEvent.Zones), ", ") + "`\n"
-	text += "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GETZones(FrigateEvent.Zones), ",")
+	text += "┣*Zones*\n┗ `" + strings.Join(GetTagList(FrigateEvent.Zones), ", ") + "`\n"
+	text += "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GetTagList(FrigateEvent.Zones), ",")
 	msg := tgbotapi.NewMessage(conf.TelegramChatID, text)
 	msg.ParseMode = tgbotapi.ModeMarkdown
 	_, err := bot.Send(msg)
