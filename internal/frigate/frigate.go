@@ -93,7 +93,6 @@ func NormalizeTagText(text string) string {
 func GetTagList(Tags []any) []string {
 	var my_tags []string
 	for _, zone := range Tags {
-		fmt.Println(zone)
 		if zone != nil {
 			my_tags = append(my_tags, NormalizeTagText(zone.(string)))
 		}
