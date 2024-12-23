@@ -39,7 +39,7 @@ type EventsStruct []struct {
 	PlusID             interface{} `json:"plus_id"`
 	RetainIndefinitely bool        `json:"retain_indefinitely"`
 	StartTime          float64     `json:"start_time"`
-	SubLabel           []any       `json:"sub_label"`
+	// SubLabel           []any       `json:"sub_label"`
 	Thumbnail          string      `json:"thumbnail"`
 	TopScore           interface{} `json:"top_score"`
 	Zones              []any       `json:"zones"`
@@ -65,7 +65,7 @@ type EventStruct struct {
 	PlusID             interface{} `json:"plus_id"`
 	RetainIndefinitely bool        `json:"retain_indefinitely"`
 	StartTime          float64     `json:"start_time"`
-	SubLabel           []any       `json:"sub_label"`
+	// SubLabel           []any       `json:"sub_label"`
 	Thumbnail          string      `json:"thumbnail"`
 	TopScore           interface{} `json:"top_score"`
 	Zones              []any       `json:"zones"`
@@ -225,9 +225,9 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text := "*Event*\n"
 	text += "┣*Camera*\n┗ #" + NormalizeTagText(FrigateEvent.Camera) + "\n"
 	text += "┣*Label*\n┗ #" + NormalizeTagText(FrigateEvent.Label) + "\n"
-	if FrigateEvent.SubLabel != nil {
-		text += "┣*SubLabel*\n┗ #" + strings.Join(GetTagList(FrigateEvent.SubLabel), ", #") + "\n"
-	}
+	// if FrigateEvent.SubLabel != nil {
+	// 	text += "┣*SubLabel*\n┗ #" + strings.Join(GetTagList(FrigateEvent.SubLabel), ", #") + "\n"
+	// }
 	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
 	text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
 	if FrigateEvent.EndTime == 0 {
