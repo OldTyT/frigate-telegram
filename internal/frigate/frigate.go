@@ -40,9 +40,9 @@ type EventsStruct []struct {
 	RetainIndefinitely bool        `json:"retain_indefinitely"`
 	StartTime          float64     `json:"start_time"`
 	// SubLabel           []any       `json:"sub_label"`
-	Thumbnail          string      `json:"thumbnail"`
-	TopScore           interface{} `json:"top_score"`
-	Zones              []any       `json:"zones"`
+	Thumbnail string      `json:"thumbnail"`
+	TopScore  interface{} `json:"top_score"`
+	Zones     []any       `json:"zones"`
 }
 
 type EventStruct struct {
@@ -66,9 +66,9 @@ type EventStruct struct {
 	RetainIndefinitely bool        `json:"retain_indefinitely"`
 	StartTime          float64     `json:"start_time"`
 	// SubLabel           []any       `json:"sub_label"`
-	Thumbnail          string      `json:"thumbnail"`
-	TopScore           interface{} `json:"top_score"`
-	Zones              []any       `json:"zones"`
+	Thumbnail string      `json:"thumbnail"`
+	TopScore  interface{} `json:"top_score"`
+	Zones     []any       `json:"zones"`
 }
 
 var Events EventsStruct
@@ -264,7 +264,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 			ErrorSend("Error receiving information about the clip file: "+err.Error(), bot, FrigateEvent.ID)
 		}
 
-		if videoInfo.Size() < 52428800 {
+		if videoInfo.Size() < 52428800 && videoInfo.Size() > 0 {
 			// Telegram don't send large file see for more: https://github.com/OldTyT/frigate-telegram/issues/5
 			// Add clip to media group
 			MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
