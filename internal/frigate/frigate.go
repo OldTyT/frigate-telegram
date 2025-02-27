@@ -322,6 +322,19 @@ func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI, WatchDog bool
 				continue
 			}
 		}
+		if !(len(conf.FrigateExcludeLabel) == 1 && conf.FrigateExcludeLabel[0] == "None") {
+			if StringsContains(FrigateEvents[Event].Label, conf.FrigateExcludeLabel) {
+				log.Debug.Println("Skip event from camera: " + FrigateEvents[Event].Label)
+				continue
+			}
+		}
+		if !(len(conf.FrigateIncludeLabel) == 1 && conf.FrigateIncludeLabel[0] == "All") {
+			if !(StringsContains(FrigateEvents[Event].Label, conf.FrigateIncludeLabel)) {
+				log.Debug.Println("Skip event from camera: " + FrigateEvents[Event].Label)
+				continue
+			}
+		}
+
 		if redis.CheckEvent(RedisKeyPrefix + FrigateEvents[Event].ID) {
 			if WatchDog {
 				SendTextEvent(FrigateEvents[Event], bot)

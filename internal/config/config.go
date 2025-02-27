@@ -24,6 +24,8 @@ type Config struct {
 	SendTextEvent        bool
 	FrigateIncludeCamera []string
 	FrigateExcludeCamera []string
+	FrigateExcludeLabel  []string
+	FrigateIncludeLabel  []string
 }
 
 // New returns a new Config struct
@@ -46,6 +48,8 @@ func New() *Config {
 		SendTextEvent:        getEnvAsBool("SEND_TEXT_EVENT", false),
 		FrigateExcludeCamera: getEnvAsSlice("FRIGATE_EXCLUDE_CAMERA", []string{"None"}, ","),
 		FrigateIncludeCamera: getEnvAsSlice("FRIGATE_INCLUDE_CAMERA", []string{"All"}, ","),
+		FrigateExcludeLabel:  getEnvAsSlice("FRIGATE_EXCLUDE_LABEL", []string{"None"}, ","),
+		FrigateIncludeLabel:  getEnvAsSlice("FRIGATE_INCLUDE_LABEL", []string{"All"}, ","),
 	}
 }
 
