@@ -48,3 +48,5 @@ docker compose up -d
 | `SEND_TEXT_EVENT` | `False` | Send text event without media |
 | `FRIGATE_EXCLUDE_CAMERA` | `None` | List exclude frigate camera, separate `,` |
 | `FRIGATE_INCLUDE_CAMERA` | `All` | List Include frigate camera, separate `,` |
+| `FRIGATE_EXCLUDE_LABEL` | `None` | List exclude frigate event, separate `,` |
+| `FRIGATE_INCLUDE_LABEL` | `All` | List Include frigate event, separate `,` |
