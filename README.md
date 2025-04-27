@@ -62,7 +62,7 @@ Commands:
 * `/mute`
 * `/unmute`
 
-> [!WARNING] Warning
+> [!WARNING]
 > For security reasons, commands only work in the TelegramChatID chat.
 
 ### Stop/resume send events messages
@@ -73,5 +73,5 @@ Commands:
 * `/stop`
 * `/resume`
 
-> [!WARNING] Warning
+> [!WARNING]
 > For security reasons, commands only work in the TelegramChatID chat.
