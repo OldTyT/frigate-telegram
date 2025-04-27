@@ -8,6 +8,8 @@ import (
 	"github.com/oldtyt/frigate-telegram/internal/config"
 	"github.com/oldtyt/frigate-telegram/internal/frigate"
 	"github.com/oldtyt/frigate-telegram/internal/log"
+	"github.com/oldtyt/frigate-telegram/internal/redis"
+	"github.com/oldtyt/frigate-telegram/internal/telegram"
 )
 
 // FrigateEvents is frigate events struct
@@ -15,46 +17,6 @@ var FrigateEvents frigate.EventsStruct
 
 // FrigateEvent is frigate event struct
 var FrigateEvent frigate.EventStruct
-
-// PongBot is needed to check the work of the bot.
-func PongBot(bot *tgbotapi.BotAPI) {
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates := bot.GetUpdatesChan(u)
-
-	for update := range updates {
-		if update.Message == nil { // ignore any non-Message updates
-			continue
-		}
-
-		if !update.Message.IsCommand() { // ignore any non-command Messages
-			continue
-		}
-
-		// Create a new MessageConfig. We don't have text yet,
-		// so we leave it empty.
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-
-		// Extract the command from the Message.
-		switch update.Message.Command() {
-		case "help":
-			msg.Text = "I understand /ping."
-		case "ping":
-			msg.Text = "pong"
-		case "pong":
-			msg.Text = "ping"
-		case "status":
-			msg.Text = "I'm ok."
-		default:
-			msg.Text = "I don't know that command"
-		}
-
-		if _, err := bot.Send(msg); err != nil {
-			log.Error.Fatalln("Error sending message: " + err.Error())
-		}
-	}
-}
 
 func main() {
 	// Initializing logger
@@ -82,7 +44,7 @@ func main() {
 	}
 
 	// Starting ping command handler(healthcheck)
-	go PongBot(bot)
+	go telegram.ChatBot(bot, conf)
 
 	FrigateEventsURL := conf.FrigateURL + "/api/events"
 
@@ -91,8 +53,12 @@ func main() {
 	}
 	// Starting loop for getting events from Frigate
 	for {
-		FrigateEvents := frigate.GetEvents(FrigateEventsURL, bot, true)
-		frigate.ParseEvents(FrigateEvents, bot, false)
+		if redis.GetStateSendEvent() {
+			FrigateEvents := frigate.GetEvents(FrigateEventsURL, bot, true)
+			frigate.ParseEvents(FrigateEvents, bot, false)
+		} else {
+			log.Debug.Println("Skiping send events.")
+		}
 		time.Sleep(time.Duration(conf.SleepTime) * time.Second)
 		log.Debug.Println("Sleeping for " + strconv.Itoa(conf.SleepTime) + " seconds.")
 	}
