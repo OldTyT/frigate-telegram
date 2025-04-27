@@ -112,23 +112,23 @@ func ErrorSend(TextError string, bot *tgbotapi.BotAPI, EventID string) {
 
 func SaveThumbnail(EventID string, Thumbnail string, bot *tgbotapi.BotAPI) string {
 	log.Debug.Printf("Processing thumbnail for event ID: %s", EventID)
-	
+
 	// Verify that we have a non-empty thumbnail string
 	if Thumbnail == "" {
 		ErrorSend("Empty thumbnail string received", bot, EventID)
 	}
-	
+
 	// Decode string Thumbnail base64
 	dec, err := base64.StdEncoding.DecodeString(Thumbnail)
 	if err != nil {
 		ErrorSend("Error when base64 string decode: "+err.Error(), bot, EventID)
 	}
-	
+
 	// Check if we got any data after decoding
 	if len(dec) == 0 {
 		ErrorSend("Decoded thumbnail is empty", bot, EventID)
 	}
-	
+
 	log.Debug.Printf("Decoded thumbnail size: %d bytes", len(dec))
 
 	// Generate uniq filename
@@ -138,36 +138,36 @@ func SaveThumbnail(EventID string, Thumbnail string, bot *tgbotapi.BotAPI) strin
 		ErrorSend("Error when create file: "+err.Error(), bot, EventID)
 	}
 	defer f.Close()
-	
+
 	// Write data to file
 	bytesWritten, err := f.Write(dec)
 	if err != nil {
 		ErrorSend("Error when write file: "+err.Error(), bot, EventID)
 	}
-	
+
 	// Check if we wrote anything
 	if bytesWritten == 0 {
 		ErrorSend("No data written to thumbnail file", bot, EventID)
 	}
-	
+
 	log.Debug.Printf("Written %d bytes to %s", bytesWritten, filename)
-	
+
 	// Ensure file is properly synced to disk
 	err = f.Sync()
 	if err != nil {
 		ErrorSend("Error when sync file: "+err.Error(), bot, EventID)
 	}
-	
+
 	// Verify file exists and has content
 	fileInfo, err := os.Stat(filename)
 	if err != nil {
 		ErrorSend("Error verifying thumbnail file: "+err.Error(), bot, EventID)
 	}
-	
+
 	if fileInfo.Size() == 0 {
 		ErrorSend("Thumbnail file is empty after write", bot, EventID)
 	}
-	
+
 	log.Debug.Printf("Successfully saved thumbnail to %s (size: %d bytes)", filename, fileInfo.Size())
 	return filename
 }
@@ -220,23 +220,23 @@ func DownloadThumbnail(EventID string, bot *tgbotapi.BotAPI) string {
 	if bytesWritten == 0 {
 		ErrorSend("No data written to thumbnail file", bot, EventID)
 	}
-	
+
 	// Ensure file is properly synced to disk
 	err = f.Sync()
 	if err != nil {
 		ErrorSend("Error syncing file to disk: "+err.Error(), bot, EventID)
 	}
-	
+
 	// Verify file exists and has content
 	fileInfo, err := os.Stat(filename)
 	if err != nil {
 		ErrorSend("Error verifying thumbnail file: "+err.Error(), bot, EventID)
 	}
-	
+
 	if fileInfo.Size() == 0 {
 		ErrorSend("Thumbnail file is empty after download", bot, EventID)
 	}
-	
+
 	log.Debug.Printf("Successfully downloaded thumbnail to %s (size: %d bytes)", filename, fileInfo.Size())
 	return filename
 }
@@ -334,29 +334,29 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 	if bytesWritten == 0 {
 		ErrorSend("No data written to clip file", bot, EventID)
 	}
-	
+
 	// Ensure file is properly synced to disk
 	err = f.Sync()
 	if err != nil {
 		ErrorSend("Error syncing file to disk: "+err.Error(), bot, EventID)
 	}
-	
+
 	// Close the file
 	err = f.Close()
 	if err != nil {
 		ErrorSend("Error closing clip file: "+err.Error(), bot, EventID)
 	}
-	
+
 	// Verify file exists and has content
 	fileInfo, err := os.Stat(filename)
 	if err != nil {
 		ErrorSend("Error verifying clip file: "+err.Error(), bot, EventID)
 	}
-	
+
 	if fileInfo.Size() == 0 {
 		ErrorSend("Clip file is empty after download", bot, EventID)
 	}
-	
+
 	log.Debug.Printf("Successfully downloaded clip to %s (size: %d bytes)", filename, fileInfo.Size())
 	return filename
 }
@@ -396,7 +396,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		// Try to use the base64 thumbnail first
 		log.Debug.Println("Using base64 thumbnail from event data")
 		FilePathThumbnail = SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
-		
+
 		// Verify thumbnail file has content
 		fileInfo, err := os.Stat(FilePathThumbnail)
 		if err != nil || fileInfo.Size() == 0 {
@@ -412,20 +412,20 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		log.Debug.Println("No thumbnail in event data, downloading directly")
 		FilePathThumbnail = DownloadThumbnail(FrigateEvent.ID, bot)
 	}
-	
+
 	var medias []interface{}
-	
+
 	// Verify thumbnail file before adding to media group
 	thumbnailInfo, err := os.Stat(FilePathThumbnail)
 	if err != nil {
 		ErrorSend("Error getting thumbnail file info: "+err.Error(), bot, FrigateEvent.ID)
 	}
-	
+
 	if thumbnailInfo.Size() == 0 {
 		log.Error.Printf("Thumbnail file is empty: %s", FilePathThumbnail)
 		ErrorSend("Cannot send empty thumbnail file", bot, FrigateEvent.ID)
 	}
-	
+
 	MediaThumbnail := tgbotapi.NewInputMediaPhoto(tgbotapi.FilePath(FilePathThumbnail))
 	MediaThumbnail.Caption = text
 	MediaThumbnail.ParseMode = tgbotapi.ModeMarkdown
@@ -465,9 +465,10 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		ChatID: conf.TelegramChatID,
 		Media:  medias,
 	}
-	
+	msg.DisableNotification = redis.GetStateMuteEvent()
+
 	log.Debug.Printf("Sending media group with %d items", len(medias))
-	
+
 	messages, err := bot.SendMediaGroup(msg)
 	if err != nil {
 		log.Error.Printf("Failed to send media group: %s", err.Error())
@@ -582,6 +583,7 @@ func SendTextEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text += "┣*Event URL*\n┗ " + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GetTagList(FrigateEvent.Zones), ",")
 	msg := tgbotapi.NewMessage(conf.TelegramChatID, text)
 	msg.ParseMode = tgbotapi.ModeMarkdown
+	msg.DisableNotification = redis.GetStateMuteEvent()
 	_, err := bot.Send(msg)
 	if err != nil {
 		log.Error.Println(err.Error())

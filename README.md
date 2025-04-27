@@ -50,3 +50,28 @@ docker compose up -d
 | `FRIGATE_INCLUDE_CAMERA` | `All` | List Include frigate camera, separate `,` |
 | `FRIGATE_EXCLUDE_LABEL` | `None` | List exclude frigate event, separate `,` |
 | `FRIGATE_INCLUDE_LABEL` | `All` | List Include frigate event, separate `,` |
+
+
+## Features
+
+### Mute/unmute events messages
+
+You can enable or disable notifications for event messages (data is stored in Redis, ensuring persistence across restarts).
+
+Commands:
+* `/mute`
+* `/unmute`
+
+> [!WARNING] Warning
+> For security reasons, commands only work in the TelegramChatID chat.
+
+### Stop/resume send events messages
+
+You can pause or resume sending notifications for event messages (data is stored in Redis, ensuring persistence across restarts).
+
+Commands:
+* `/stop`
+* `/resume`
+
+> [!WARNING] Warning
+> For security reasons, commands only work in the TelegramChatID chat.
