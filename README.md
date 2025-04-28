@@ -50,6 +50,8 @@ docker compose up -d
 | `FRIGATE_INCLUDE_CAMERA` | `All` | List Include frigate camera, separate `,` |
 | `FRIGATE_EXCLUDE_LABEL` | `None` | List exclude frigate event, separate `,` |
 | `FRIGATE_INCLUDE_LABEL` | `All` | List Include frigate event, separate `,` |
+| `FRIGATE_EXCLUDE_ZONE` | `None` | List exclude frigate zone, separate `,` |
+| `FRIGATE_INCLUDE_ZONE` | `All` | List Include frigate zone, separate `,` |
 
 
 ## Features

@@ -535,30 +535,55 @@ func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI, WatchDog bool
 		RedisKeyPrefix = "WatchDog_"
 	}
 	for Event := range FrigateEvents {
+		// Skip by camera
 		if !(len(conf.FrigateExcludeCamera) == 1 && conf.FrigateExcludeCamera[0] == "None") {
 			if StringsContains(FrigateEvents[Event].Camera, conf.FrigateExcludeCamera) {
-				log.Debug.Println("Skip event from camera: " + FrigateEvents[Event].Camera)
+				log.Debug.Println("Skiping event from camera: " + FrigateEvents[Event].Camera)
 				continue
 			}
 		}
 		if !(len(conf.FrigateIncludeCamera) == 1 && conf.FrigateIncludeCamera[0] == "All") {
 			if !(StringsContains(FrigateEvents[Event].Camera, conf.FrigateIncludeCamera)) {
-				log.Debug.Println("Skip event from camera: " + FrigateEvents[Event].Camera)
+				log.Debug.Println("Skiping event from camera: " + FrigateEvents[Event].Camera)
 				continue
 			}
 		}
+		// Skip by camera
+
+		// Skip by label
 		if !(len(conf.FrigateExcludeLabel) == 1 && conf.FrigateExcludeLabel[0] == "None") {
 			if StringsContains(FrigateEvents[Event].Label, conf.FrigateExcludeLabel) {
-				log.Debug.Println("Skip event from camera: " + FrigateEvents[Event].Label)
+				log.Debug.Println("Skiping event by label: " + FrigateEvents[Event].Label)
 				continue
 			}
 		}
 		if !(len(conf.FrigateIncludeLabel) == 1 && conf.FrigateIncludeLabel[0] == "All") {
 			if !(StringsContains(FrigateEvents[Event].Label, conf.FrigateIncludeLabel)) {
-				log.Debug.Println("Skip event from camera: " + FrigateEvents[Event].Label)
+				log.Debug.Println("Skiping event by label: " + FrigateEvents[Event].Label)
 				continue
 			}
 		}
+		// Skip by label
+
+		// Skip by zone
+		zones := GetTagList(FrigateEvents[Event].Zones)
+		if !(len(conf.FrigateExcludeZone) == 1 && conf.FrigateExcludeZone[0] == "None") {
+			for _, zone := range zones {
+				if StringsContains(zone, conf.FrigateExcludeZone) {
+					log.Debug.Println("Skiping event by zone: " + zone)
+					continue
+				}
+			}
+		}
+		if !(len(conf.FrigateIncludeZone) == 1 && conf.FrigateIncludeZone[0] == "All") {
+			for _, zone := range zones {
+				if !(StringsContains(zone, conf.FrigateIncludeZone)) {
+					log.Debug.Println("Skiping event by zone: " + zone)
+					continue
+				}
+			}
+		}
+		// Skip by zone
 
 		if redis.CheckEvent(RedisKeyPrefix + FrigateEvents[Event].ID) {
 			if WatchDog {
