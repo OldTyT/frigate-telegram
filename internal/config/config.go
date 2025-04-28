@@ -26,6 +26,8 @@ type Config struct {
 	FrigateExcludeCamera []string
 	FrigateExcludeLabel  []string
 	FrigateIncludeLabel  []string
+	FrigateExcludeZone   []string
+	FrigateIncludeZone   []string
 }
 
 // New returns a new Config struct
@@ -50,6 +52,8 @@ func New() *Config {
 		FrigateIncludeCamera: getEnvAsSlice("FRIGATE_INCLUDE_CAMERA", []string{"All"}, ","),
 		FrigateExcludeLabel:  getEnvAsSlice("FRIGATE_EXCLUDE_LABEL", []string{"None"}, ","),
 		FrigateIncludeLabel:  getEnvAsSlice("FRIGATE_INCLUDE_LABEL", []string{"All"}, ","),
+		FrigateExcludeZone:   getEnvAsSlice("FRIGATE_EXCLUDE_ZONE", []string{"None"}, ","),
+		FrigateIncludeZone:   getEnvAsSlice("FRIGATE_INCLUDE_ZONE", []string{"All"}, ","),
 	}
 }
 

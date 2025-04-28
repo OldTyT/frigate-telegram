@@ -72,6 +72,7 @@ func Help(msg tgbotapi.MessageConfig, conf *config.Config) (bool, tgbotapi.Messa
 		text += "Resume send events: /resume\n"
 		text += "Mute send events: /mute\n"
 		text += "Unmute send events: /unmute\n"
+		text += "Current status: /status\n"
 		text += "Comand working only in chat id: `" + strconv.FormatInt(conf.TelegramChatID, 10) + "` (Current chat)"
 		msg.Text = text
 		msg.ParseMode = tgbotapi.ModeMarkdown
