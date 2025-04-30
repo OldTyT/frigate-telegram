@@ -94,7 +94,7 @@ func Status(msg tgbotapi.MessageConfig, conf *config.Config) (bool, tgbotapi.Mes
 
 func Stop(msg tgbotapi.MessageConfig, conf *config.Config) (bool, tgbotapi.MessageConfig) {
 	if msg.BaseChat.ChatID == conf.TelegramChatID {
-		r := redis.SetStateSendEvent(false)
+		r := redis.SetStateSendEvent(true)
 		if r {
 			msg.Text = "Stop send message."
 			return true, msg
@@ -108,7 +108,7 @@ func Stop(msg tgbotapi.MessageConfig, conf *config.Config) (bool, tgbotapi.Messa
 
 func Resume(msg tgbotapi.MessageConfig, conf *config.Config) (bool, tgbotapi.MessageConfig) {
 	if msg.BaseChat.ChatID == conf.TelegramChatID {
-		r := redis.SetStateSendEvent(true)
+		r := redis.SetStateSendEvent(false)
 		if r {
 			msg.Text = "Resume send message."
 			return true, msg

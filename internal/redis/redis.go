@@ -25,8 +25,8 @@ var rdb = redis.NewClient(&redis.Options{
 
 // Set state send event msg in redis
 func SetStateSendEvent(send bool) bool {
-	// send = true - send msg
-	// send = false - don't send msg
+	// send = false - send msg
+	// send = true - don't send msg
 	if send {
 		err := rdb.Set(ctx, RedisKeyStateSendEvent, 1, 0).Err()
 		if err != nil {
