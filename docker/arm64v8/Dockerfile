@@ -1,4 +1,4 @@
-FROM arm64v8/golang:1.21.3-alpine3.18 AS builder
+FROM arm64v8/golang:1.24-alpine AS builder
 
 WORKDIR $GOPATH/frigate-telegram
 COPY . $GOPATH/frigate-telegram
@@ -7,7 +7,7 @@ RUN apk --no-cache add binutils && \
     go build . && \
     strip frigate-telegram
 
-FROM arm64v8/alpine:3.18
+FROM arm64v8/alpine
 
 RUN apk --no-cache add tzdata
 
