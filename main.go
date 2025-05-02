@@ -9,6 +9,7 @@ import (
 	"github.com/oldtyt/frigate-telegram/internal/frigate"
 	"github.com/oldtyt/frigate-telegram/internal/log"
 	"github.com/oldtyt/frigate-telegram/internal/redis"
+	"github.com/oldtyt/frigate-telegram/internal/restapi"
 	"github.com/oldtyt/frigate-telegram/internal/telegram"
 )
 
@@ -25,9 +26,13 @@ func main() {
 	conf := config.New()
 
 	// Prepare startup msg
-	startupMsg := "Starting frigate-telegram.\n"
-	startupMsg += "Frigate URL:  " + conf.FrigateURL + "\n"
+	startupMsg := "Starting frigate-telegram. "
+	startupMsg += "Frigate URL: " + conf.FrigateURL
 	log.Info.Println(startupMsg)
+
+	if conf.RestAPIEnable {
+		go restapi.RunServer(conf)
+	}
 
 	// Initializing telegram bot
 	bot, err := tgbotapi.NewBotAPI(conf.TelegramBotToken)

@@ -8,20 +8,22 @@ import (
 
 type Config struct {
 	Debug                bool
-	TelegramBotToken     string
-	FrigateURL           string
+	SendTextEvent        bool
+	RestAPIEnable        bool
 	FrigateEventLimit    int
-	TelegramChatID       int64
 	SleepTime            int
-	FrigateExternalURL   string
-	RedisAddr            string
-	RedisPassword        string
 	RedisDB              int
 	RedisProtocol        int
 	RedisTTL             int
 	WatchDogSleepTime    int
 	EventBeforeSeconds   int
-	SendTextEvent        bool
+	TelegramChatID       int64
+	TelegramBotToken     string
+	FrigateURL           string
+	FrigateExternalURL   string
+	RedisAddr            string
+	RedisPassword        string
+	RestAPIListenAddr    string
 	FrigateIncludeCamera []string
 	FrigateExcludeCamera []string
 	FrigateExcludeLabel  []string
@@ -54,6 +56,8 @@ func New() *Config {
 		FrigateIncludeLabel:  getEnvAsSlice("FRIGATE_INCLUDE_LABEL", []string{"All"}, ","),
 		FrigateExcludeZone:   getEnvAsSlice("FRIGATE_EXCLUDE_ZONE", []string{"None"}, ","),
 		FrigateIncludeZone:   getEnvAsSlice("FRIGATE_INCLUDE_ZONE", []string{"All"}, ","),
+		RestAPIEnable:        getEnvAsBool("REST_API_ENABLE", false),
+		RestAPIListenAddr:    getEnv("REST_API_LISTEN_ADDR", ":8080"),
 	}
 }
 

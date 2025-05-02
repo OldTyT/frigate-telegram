@@ -52,9 +52,15 @@ docker compose up -d
 | `FRIGATE_INCLUDE_LABEL` | `All` | List Include frigate event, separate `,` |
 | `FRIGATE_EXCLUDE_ZONE` | `None` | List exclude frigate zone, separate `,` |
 | `FRIGATE_INCLUDE_ZONE` | `All` | List Include frigate zone, separate `,` |
+| `REST_API_ENABLE` | `False` | Enabling the http rest API |
+| `REST_API_LISTEN_ADDR` | `:8080` | Rest API listen addr |
 
 
 ## Features
+
+### Rest API
+
+Swagger aviaible on: `http://localhost:8080/docs/index.html`
 
 ### Mute/unmute events messages
 
