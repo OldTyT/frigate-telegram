@@ -20,6 +20,8 @@ services:
     image: ghcr.io/oldtyt/frigate-telegram:amd64
     restart: always
     networks: [net]
+    ports: 
+      - 8080:8080
     environment:
       TELEGRAM_BOT_TOKEN: 1234567890:ABCDEFGHEFGREHBTYJBTRGBER34T54Y54
       FRIGATE_URL: http://192.168.0.254:5000
@@ -30,6 +32,7 @@ services:
       FRIGATE_EXTERNAL_URL: https://frigate.domain.com
       TZ: Europe/Berlin
       REDIS_ADDR: "redis:6379"
+      REST_API_ENABLE: False
     volumes:
       - type: tmpfs # Optional
         target: /tmp

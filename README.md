@@ -60,7 +60,20 @@ docker compose up -d
 
 ### Rest API
 
-Swagger aviaible on: `http://localhost:8080/docs/index.html`
+First the API needs to be enabled in the ENV. The docker-compose.yml has the ENV already but set to "False" per default.
+REST_API_ENABLE: True
+
+The Full URL: http://IP-OF-DOCKER-HOST:8080/api/v1/COMMAND
+
+Possible Commands: 
+- /mute
+- /ping
+- /resume
+- /status
+- /stop
+- /unmute
+
+For more details Swagger aviaible on: `http://localhost:8080/docs/index.html`
 
 ### Mute/unmute events messages
 
