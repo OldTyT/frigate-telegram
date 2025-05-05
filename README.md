@@ -65,7 +65,7 @@ REST_API_ENABLE: True
 
 The Full URL: http://IP-OF-DOCKER-HOST:8080/api/v1/COMMAND
 
-Possible Commands: 
+Possible Commands:
 - /mute
 - /ping
 - /resume
