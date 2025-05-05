@@ -3,9 +3,6 @@ name: Dev Docker Image CI(GitHub)
 
 on:
   push:
-    branches:
-      - dev
-
 
 jobs:
   build_amd64:
@@ -25,8 +22,8 @@ jobs:
         run: >-
           docker build
           -t $IMAGE_NAME
-          -t $REPOSITORY_URL/$IMAGE_NAME:dev-amd64-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
-          -t $REPOSITORY_URL/$IMAGE_NAME:dev-amd64
+          -t $REPOSITORY_URL/$IMAGE_NAME:${{ github.ref_name }}-amd64-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
+          -t $REPOSITORY_URL/$IMAGE_NAME:${{ github.ref_name }}-amd64
           -f docker/amd64/Dockerfile .
       - name: Docker Login
         uses: docker/login-action@v3
@@ -62,8 +59,8 @@ jobs:
         run: >-
           docker buildx build
           --platform linux/arm/v6
-          -t $REPOSITORY_URL/$IMAGE_NAME:dev-arm32v6-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
-          -t $REPOSITORY_URL/$IMAGE_NAME:dev-arm32v6
+          -t $REPOSITORY_URL/$IMAGE_NAME:${{ github.ref_name }}-arm32v6-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
+          -t $REPOSITORY_URL/$IMAGE_NAME:${{ github.ref_name }}-arm32v6
           -f docker/arm32v6/Dockerfile --push .
   build_arm32v7:
     name: "[arm32v7] Build & Push"
@@ -90,8 +87,8 @@ jobs:
         run: >-
           docker buildx build
           --platform linux/arm/v7
-          -t $REPOSITORY_URL/$IMAGE_NAME:dev-arm32v7-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
-          -t $REPOSITORY_URL/$IMAGE_NAME:dev-arm32v7
+          -t $REPOSITORY_URL/$IMAGE_NAME:${{ github.ref_name }}-arm32v7-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
+          -t $REPOSITORY_URL/$IMAGE_NAME:${{ github.ref_name }}-arm32v7
           -f docker/arm32v7/Dockerfile --push .
   build_arm64v8:
     name: "[arm64v8] Build & Push"
@@ -118,6 +115,6 @@ jobs:
         run: >-
           docker buildx build
           --platform linux/arm64/v8
-          -t $REPOSITORY_URL/$IMAGE_NAME:dev-arm64v8-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
-          -t $REPOSITORY_URL/$IMAGE_NAME:dev-arm64v8
+          -t $REPOSITORY_URL/$IMAGE_NAME:${{ github.ref_name }}-arm64v8-${{ steps.vars.outputs.SHORT_COMMIT_ID }}
+          -t $REPOSITORY_URL/$IMAGE_NAME:${{ github.ref_name }}-arm64v8
           -f docker/arm64v8/Dockerfile --push .

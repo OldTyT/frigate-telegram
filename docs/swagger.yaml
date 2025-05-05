@@ -1,0 +1,92 @@
+info:
+  contact: {}
+paths:
+  /mute:
+    get:
+      consumes:
+      - application/json
+      description: Mute send event
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "502":
+          description: Bad Gateway
+      summary: Mute send event
+      tags:
+      - status
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: Pong
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Ping
+      tags:
+      - status
+  /resume:
+    get:
+      consumes:
+      - application/json
+      description: Resume send event
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "502":
+          description: Bad Gateway
+      summary: Resume send event
+      tags:
+      - status
+  /status:
+    get:
+      consumes:
+      - application/json
+      description: Current status
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "502":
+          description: Bad Gateway
+      summary: Get status
+      tags:
+      - status
+  /stop:
+    get:
+      consumes:
+      - application/json
+      description: Stop send event
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "502":
+          description: Bad Gateway
+      summary: Stop send event
+      tags:
+      - status
+  /unmute:
+    get:
+      consumes:
+      - application/json
+      description: Unmute send event
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "502":
+          description: Bad Gateway
+      summary: Unmute send event
+      tags:
+      - status
+swagger: "2.0"

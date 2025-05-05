@@ -50,3 +50,49 @@ docker compose up -d
 | `FRIGATE_INCLUDE_CAMERA` | `All` | List Include frigate camera, separate `,` |
 | `FRIGATE_EXCLUDE_LABEL` | `None` | List exclude frigate event, separate `,` |
 | `FRIGATE_INCLUDE_LABEL` | `All` | List Include frigate event, separate `,` |
+| `FRIGATE_EXCLUDE_ZONE` | `None` | List exclude frigate zone, separate `,` |
+| `FRIGATE_INCLUDE_ZONE` | `All` | List Include frigate zone, separate `,` |
+| `REST_API_ENABLE` | `False` | Enabling the http rest API |
+| `REST_API_LISTEN_ADDR` | `:8080` | Rest API listen addr |
+
+
+## Features
+
+### Rest API
+
+First the API needs to be enabled in the ENV. The docker-compose.yml has the ENV already but set to "False" per default.
+REST_API_ENABLE: True
+
+The Full URL: http://IP-OF-DOCKER-HOST:8080/api/v1/COMMAND
+
+Possible Commands: 
+- /mute
+- /ping
+- /resume
+- /status
+- /stop
+- /unmute
+
+For more details Swagger aviaible on: `http://localhost:8080/docs/index.html`
+
+### Mute/unmute events messages
+
+You can enable or disable notifications for event messages (data is stored in Redis, ensuring persistence across restarts).
+
+Commands:
+* `/mute`
+* `/unmute`
+
+> [!WARNING]
+> For security reasons, commands only work in the TelegramChatID chat.
+
+### Stop/resume send events messages
+
+You can pause or resume sending notifications for event messages (data is stored in Redis, ensuring persistence across restarts).
+
+Commands:
+* `/stop`
+* `/resume`
+
+> [!WARNING]
+> For security reasons, commands only work in the TelegramChatID chat.
