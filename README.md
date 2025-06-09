@@ -3,7 +3,7 @@
 
 # Frigate telegram
 
-Frigate telegram event notifications with interactive buttons for easy control.
+Frigate telegram event notifications.
 
 ---
 
@@ -75,14 +75,11 @@ Possible Commands:
 
 For more details Swagger aviaible on: `http://localhost:8080/docs/index.html`
 
-> [!NOTE]
-> These commands are also available directly in the Telegram bot via text commands and interactive buttons.
-
 ### Mute/unmute events messages
 
 You can enable or disable notifications for event messages (data is stored in Redis, ensuring persistence across restarts).
 
-Commands (available both as text commands and interactive buttons):
+Commands:
 * `/mute`
 * `/unmute`
 
@@ -93,19 +90,9 @@ Commands (available both as text commands and interactive buttons):
 
 You can pause or resume sending notifications for event messages (data is stored in Redis, ensuring persistence across restarts).
 
-Commands (available both as text commands and interactive buttons):
+Commands:
 * `/stop`
 * `/resume`
-
-> [!WARNING]
-> For security reasons, commands only work in the TelegramChatID chat.
-
-### Check current status
-
-You can check the current status of the bot (whether sending events is stopped and whether notifications are muted).
-
-Command (available both as text command and interactive button):
-* `/status`
 
 > [!WARNING]
 > For security reasons, commands only work in the TelegramChatID chat.
