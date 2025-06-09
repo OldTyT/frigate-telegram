@@ -42,11 +42,8 @@ func main() {
 	bot.Debug = conf.Debug
 	log.Info.Println("Authorized on account " + bot.Self.UserName)
 
-	// Send startup msg with command buttons
-	startupMsg += "\n\nUse /help to see available commands or use the buttons below."
-	msg := tgbotapi.NewMessage(conf.TelegramChatID, startupMsg)
-	msg.ReplyMarkup = telegram.CommandKeyboard()
-	_, errmsg := bot.Send(msg)
+	// Send startup msg.
+	_, errmsg := bot.Send(tgbotapi.NewMessage(conf.TelegramChatID, startupMsg))
 	if errmsg != nil {
 		log.Error.Println(errmsg.Error())
 	}
