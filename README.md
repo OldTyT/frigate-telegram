@@ -54,6 +54,7 @@ docker compose up -d
 | `FRIGATE_INCLUDE_ZONE` | `All` | List Include frigate zone, separate `,` |
 | `REST_API_ENABLE` | `False` | Enabling the http rest API |
 | `REST_API_LISTEN_ADDR` | `:8080` | Rest API listen addr |
+| `SHORT_EVENT_MESSAGE_FORMAT` | `False` | Short event message format |
 
 
 ## Features
