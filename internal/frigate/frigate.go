@@ -396,46 +396,49 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		text += "┗[Source clip](" + conf.FrigateExternalURL + "/api/events/" + FrigateEvent.ID + "/clip.mp4)\n"
 	}
 
-	// Save thumbnail
+	var medias []interface{}
 	var FilePathThumbnail string
-	if FrigateEvent.Thumbnail != "" {
-		// Try to use the base64 thumbnail first
-		log.Debug.Println("Using base64 thumbnail from event data")
-		FilePathThumbnail = SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
 
-		// Verify thumbnail file has content
-		fileInfo, err := os.Stat(FilePathThumbnail)
-		if err != nil || fileInfo.Size() == 0 {
-			log.Debug.Println("Base64 thumbnail failed, trying direct download")
-			// If base64 method failed, try direct download
-			if err == nil {
-				os.Remove(FilePathThumbnail) // Remove empty file
+	if !conf.OnlyVideoOnMessage {
+		// Save thumbnail
+		if FrigateEvent.Thumbnail != "" {
+			// Try to use the base64 thumbnail first
+			log.Debug.Println("Using base64 thumbnail from event data")
+			FilePathThumbnail = SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
+
+			// Verify thumbnail file has content
+			fileInfo, err := os.Stat(FilePathThumbnail)
+			if err != nil || fileInfo.Size() == 0 {
+				log.Debug.Println("Base64 thumbnail failed, trying direct download")
+				// If base64 method failed, try direct download
+				if err == nil {
+					os.Remove(FilePathThumbnail) // Remove empty file
+				}
+				FilePathThumbnail = DownloadThumbnail(FrigateEvent.ID, bot)
 			}
+		} else {
+			// No thumbnail in event data, download directly
+			log.Debug.Println("No thumbnail in event data, downloading directly")
 			FilePathThumbnail = DownloadThumbnail(FrigateEvent.ID, bot)
 		}
-	} else {
-		// No thumbnail in event data, download directly
-		log.Debug.Println("No thumbnail in event data, downloading directly")
-		FilePathThumbnail = DownloadThumbnail(FrigateEvent.ID, bot)
+
+		// Verify thumbnail file before adding to media group
+		thumbnailInfo, err := os.Stat(FilePathThumbnail)
+		if err != nil {
+			ErrorSend("Error getting thumbnail file info: "+err.Error(), bot, FrigateEvent.ID)
+		}
+
+		if thumbnailInfo.Size() == 0 {
+			log.Error.Printf("Thumbnail file is empty: %s", FilePathThumbnail)
+			ErrorSend("Cannot send empty thumbnail file", bot, FrigateEvent.ID)
+		}
+
+		MediaThumbnail := tgbotapi.NewInputMediaPhoto(tgbotapi.FilePath(FilePathThumbnail))
+		MediaThumbnail.Caption = text
+		MediaThumbnail.ParseMode = tgbotapi.ModeMarkdown
+
+		medias = append(medias, MediaThumbnail)
 	}
-
-	var medias []interface{}
-
-	// Verify thumbnail file before adding to media group
-	thumbnailInfo, err := os.Stat(FilePathThumbnail)
-	if err != nil {
-		ErrorSend("Error getting thumbnail file info: "+err.Error(), bot, FrigateEvent.ID)
-	}
-
-	if thumbnailInfo.Size() == 0 {
-		log.Error.Printf("Thumbnail file is empty: %s", FilePathThumbnail)
-		ErrorSend("Cannot send empty thumbnail file", bot, FrigateEvent.ID)
-	}
-
-	MediaThumbnail := tgbotapi.NewInputMediaPhoto(tgbotapi.FilePath(FilePathThumbnail))
-	MediaThumbnail.Caption = text
-	MediaThumbnail.ParseMode = tgbotapi.ModeMarkdown
-	medias = append(medias, MediaThumbnail)
 
 	// Define FilePathClip outside the if block to make it available later
 	var FilePathClip string
@@ -460,6 +463,11 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 			// Add clip to media group
 			log.Debug.Printf("Adding clip to media group: %s (size: %d bytes)", FilePathClip, videoInfo.Size())
 			MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
+
+			if conf.OnlyVideoOnMessage {
+				MediaClip.Caption = text
+			}
+
 			medias = append(medias, MediaClip)
 		} else {
 			log.Debug.Printf("Clip file size is too large: %d bytes (limit: 52428800)", videoInfo.Size())
@@ -514,7 +522,10 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	if hasClip {
 		os.Remove(FilePathClip)
 	}
-	os.Remove(FilePathThumbnail)
+
+	if !conf.OnlyVideoOnMessage {
+		os.Remove(FilePathThumbnail)
+	}
 
 	var State string
 	State = "InProgress"
