@@ -371,9 +371,14 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text := ""
 	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
 	if conf.ShortEventMessageFormat {
-		text += "#" + NormalizeTagText(FrigateEvent.Label) + " detected on #" + NormalizeTagText(FrigateEvent.Camera) + fmt.Sprintf(" at %s", t_start)
+		// Short message format
+		text += fmt.Sprintf("#%s detected on #%s at %s",
+			NormalizeTagText(FrigateEvent.Label),
+			NormalizeTagText(FrigateEvent.Camera),
+			t_start)
 
 	} else {
+		// Normal message format
 		text += "*Event*\n"
 		text += "┣*Camera*\n┗ #" + NormalizeTagText(FrigateEvent.Camera) + "\n"
 		text += "┣*Label*\n┗ #" + NormalizeTagText(FrigateEvent.Label) + "\n"
@@ -399,7 +404,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	var medias []interface{}
 	var FilePathThumbnail string
 
-	if !conf.OnlyVideoOnMessage {
+	if conf.IncludeThumbnailEvent {
 		// Save thumbnail
 		if FrigateEvent.Thumbnail != "" {
 			// Try to use the base64 thumbnail first
@@ -464,7 +469,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 			log.Debug.Printf("Adding clip to media group: %s (size: %d bytes)", FilePathClip, videoInfo.Size())
 			MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
 
-			if conf.OnlyVideoOnMessage {
+			if !conf.IncludeThumbnailEvent {
 				MediaClip.Caption = text
 			}
 
@@ -523,7 +528,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		os.Remove(FilePathClip)
 	}
 
-	if !conf.OnlyVideoOnMessage {
+	if conf.IncludeThumbnailEvent {
 		os.Remove(FilePathThumbnail)
 	}
 
