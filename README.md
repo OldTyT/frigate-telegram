@@ -55,6 +55,7 @@ docker compose up -d
 | `REST_API_ENABLE` | `False` | Enabling the http rest API |
 | `REST_API_LISTEN_ADDR` | `:8080` | Rest API listen addr |
 | `SHORT_EVENT_MESSAGE_FORMAT` | `False` | Short event message format |
+| `ONLY_VIDEO_ON_MESSAGE` | `False` | Exclude thumbnail from message |
 
 
 ## Features

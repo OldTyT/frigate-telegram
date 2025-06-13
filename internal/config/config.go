@@ -11,6 +11,7 @@ type Config struct {
 	SendTextEvent           bool
 	RestAPIEnable           bool
 	ShortEventMessageFormat bool
+	OnlyVideoOnMessage bool
 	FrigateEventLimit       int
 	SleepTime               int
 	RedisDB                 int
@@ -59,6 +60,7 @@ func New() *Config {
 		FrigateIncludeZone:      getEnvAsSlice("FRIGATE_INCLUDE_ZONE", []string{"All"}, ","),
 		RestAPIEnable:           getEnvAsBool("REST_API_ENABLE", false),
 		ShortEventMessageFormat: getEnvAsBool("SHORT_EVENT_MESSAGE_FORMAT", false),
+		OnlyVideoOnMessage: getEnvAsBool("ONLY_VIDEO_ON_MESSAGE", false),
 		RestAPIListenAddr:       getEnv("REST_API_LISTEN_ADDR", ":8080"),
 	}
 }
