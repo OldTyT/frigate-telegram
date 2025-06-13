@@ -368,68 +368,82 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	redis.AddNewEvent(FrigateEvent.ID, "InWork", time.Duration(60)*time.Second)
 
 	// Prepare text message
-	text := "*Event*\n"
-	text += "┣*Camera*\n┗ #" + NormalizeTagText(FrigateEvent.Camera) + "\n"
-	text += "┣*Label*\n┗ #" + NormalizeTagText(FrigateEvent.Label) + "\n"
-	// if FrigateEvent.SubLabel != nil {
-	// 	text += "┣*SubLabel*\n┗ #" + strings.Join(GetTagList(FrigateEvent.SubLabel), ", #") + "\n"
-	// }
+	text := ""
 	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
-	text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
-	if FrigateEvent.EndTime == 0 {
-		text += "┣*End time*\n┗ `In progess`" + "\n"
+	if conf.ShortEventMessageFormat {
+		// Short message format
+		text += fmt.Sprintf("#%s detected on #%s at %s",
+			NormalizeTagText(FrigateEvent.Label),
+			NormalizeTagText(FrigateEvent.Camera),
+			t_start)
+
 	} else {
-		t_end := time.Unix(int64(FrigateEvent.EndTime), 0)
-		text += fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
-	}
-	text += fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
-	text += "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
-	text += "┣*Zones*\n┗ #" + strings.Join(GetTagList(FrigateEvent.Zones), ", #") + "\n"
-	text += "*URLs*\n"
-	text += "┣[Events](" + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GetTagList(FrigateEvent.Zones), ",") + ")\n"
-	text += "┣[General](" + conf.FrigateExternalURL + ")\n"
-	text += "┗[Source clip](" + conf.FrigateExternalURL + "/api/events/" + FrigateEvent.ID + "/clip.mp4)\n"
-
-	// Save thumbnail
-	var FilePathThumbnail string
-	if FrigateEvent.Thumbnail != "" {
-		// Try to use the base64 thumbnail first
-		log.Debug.Println("Using base64 thumbnail from event data")
-		FilePathThumbnail = SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
-
-		// Verify thumbnail file has content
-		fileInfo, err := os.Stat(FilePathThumbnail)
-		if err != nil || fileInfo.Size() == 0 {
-			log.Debug.Println("Base64 thumbnail failed, trying direct download")
-			// If base64 method failed, try direct download
-			if err == nil {
-				os.Remove(FilePathThumbnail) // Remove empty file
-			}
-			FilePathThumbnail = DownloadThumbnail(FrigateEvent.ID, bot)
+		// Normal message format
+		text += "*Event*\n"
+		text += "┣*Camera*\n┗ #" + NormalizeTagText(FrigateEvent.Camera) + "\n"
+		text += "┣*Label*\n┗ #" + NormalizeTagText(FrigateEvent.Label) + "\n"
+		// if FrigateEvent.SubLabel != nil {
+		// 	text += "┣*SubLabel*\n┗ #" + strings.Join(GetTagList(FrigateEvent.SubLabel), ", #") + "\n"
+		// }
+		text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
+		if FrigateEvent.EndTime == 0 {
+			text += "┣*End time*\n┗ `In progess`" + "\n"
+		} else {
+			t_end := time.Unix(int64(FrigateEvent.EndTime), 0)
+			text += fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
 		}
-	} else {
-		// No thumbnail in event data, download directly
-		log.Debug.Println("No thumbnail in event data, downloading directly")
-		FilePathThumbnail = DownloadThumbnail(FrigateEvent.ID, bot)
+		text += fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
+		text += "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"
+		text += "┣*Zones*\n┗ #" + strings.Join(GetTagList(FrigateEvent.Zones), ", #") + "\n"
+		text += "*URLs*\n"
+		text += "┣[Events](" + conf.FrigateExternalURL + "/events?cameras=" + FrigateEvent.Camera + "&labels=" + FrigateEvent.Label + "&zones=" + strings.Join(GetTagList(FrigateEvent.Zones), ",") + ")\n"
+		text += "┣[General](" + conf.FrigateExternalURL + ")\n"
+		text += "┗[Source clip](" + conf.FrigateExternalURL + "/api/events/" + FrigateEvent.ID + "/clip.mp4)\n"
 	}
 
 	var medias []interface{}
+	var FilePathThumbnail string
 
-	// Verify thumbnail file before adding to media group
-	thumbnailInfo, err := os.Stat(FilePathThumbnail)
-	if err != nil {
-		ErrorSend("Error getting thumbnail file info: "+err.Error(), bot, FrigateEvent.ID)
+	if conf.IncludeThumbnailEvent {
+		// Save thumbnail
+		if FrigateEvent.Thumbnail != "" {
+			// Try to use the base64 thumbnail first
+			log.Debug.Println("Using base64 thumbnail from event data")
+			FilePathThumbnail = SaveThumbnail(FrigateEvent.ID, FrigateEvent.Thumbnail, bot)
+
+			// Verify thumbnail file has content
+			fileInfo, err := os.Stat(FilePathThumbnail)
+			if err != nil || fileInfo.Size() == 0 {
+				log.Debug.Println("Base64 thumbnail failed, trying direct download")
+				// If base64 method failed, try direct download
+				if err == nil {
+					os.Remove(FilePathThumbnail) // Remove empty file
+				}
+				FilePathThumbnail = DownloadThumbnail(FrigateEvent.ID, bot)
+			}
+		} else {
+			// No thumbnail in event data, download directly
+			log.Debug.Println("No thumbnail in event data, downloading directly")
+			FilePathThumbnail = DownloadThumbnail(FrigateEvent.ID, bot)
+		}
+
+		// Verify thumbnail file before adding to media group
+		thumbnailInfo, err := os.Stat(FilePathThumbnail)
+		if err != nil {
+			ErrorSend("Error getting thumbnail file info: "+err.Error(), bot, FrigateEvent.ID)
+		}
+
+		if thumbnailInfo.Size() == 0 {
+			log.Error.Printf("Thumbnail file is empty: %s", FilePathThumbnail)
+			ErrorSend("Cannot send empty thumbnail file", bot, FrigateEvent.ID)
+		}
+
+		MediaThumbnail := tgbotapi.NewInputMediaPhoto(tgbotapi.FilePath(FilePathThumbnail))
+		MediaThumbnail.Caption = text
+		MediaThumbnail.ParseMode = tgbotapi.ModeMarkdown
+
+		medias = append(medias, MediaThumbnail)
 	}
-
-	if thumbnailInfo.Size() == 0 {
-		log.Error.Printf("Thumbnail file is empty: %s", FilePathThumbnail)
-		ErrorSend("Cannot send empty thumbnail file", bot, FrigateEvent.ID)
-	}
-
-	MediaThumbnail := tgbotapi.NewInputMediaPhoto(tgbotapi.FilePath(FilePathThumbnail))
-	MediaThumbnail.Caption = text
-	MediaThumbnail.ParseMode = tgbotapi.ModeMarkdown
-	medias = append(medias, MediaThumbnail)
 
 	// Define FilePathClip outside the if block to make it available later
 	var FilePathClip string
@@ -454,6 +468,11 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 			// Add clip to media group
 			log.Debug.Printf("Adding clip to media group: %s (size: %d bytes)", FilePathClip, videoInfo.Size())
 			MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
+
+			if !conf.IncludeThumbnailEvent {
+				MediaClip.Caption = text
+			}
+
 			medias = append(medias, MediaClip)
 		} else {
 			log.Debug.Printf("Clip file size is too large: %d bytes (limit: 52428800)", videoInfo.Size())
@@ -508,7 +527,10 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	if hasClip {
 		os.Remove(FilePathClip)
 	}
-	os.Remove(FilePathThumbnail)
+
+	if conf.IncludeThumbnailEvent {
+		os.Remove(FilePathThumbnail)
+	}
 
 	var State string
 	State = "InProgress"
