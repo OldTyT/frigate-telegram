@@ -590,11 +590,13 @@ func ParseEvents(FrigateEvents EventsStruct, bot *tgbotapi.BotAPI, WatchDog bool
 		// Skip by zone
 		zones := GetTagList(FrigateEvents[Event].Zones)
 		needSkip := false
-		if !(len(conf.FrigateExcludeZone) == 1 && conf.FrigateExcludeZone[0] == "None" && len(zones) != 0) {
-			for _, zone := range zones {
-				if StringsContains(zone, conf.FrigateExcludeZone) {
-					log.Debug.Println("Skiping event by exclude zone: " + zone)
-					needSkip = true
+		if !(len(conf.FrigateExcludeZone) == 1 && conf.FrigateExcludeZone[0] == "None") {
+			if len(zones) != 0 {
+				for _, zone := range zones {
+					if StringsContains(zone, conf.FrigateExcludeZone) {
+						log.Debug.Println("Skiping event by exclude zone: " + zone)
+						needSkip = true
+					}
 				}
 			}
 		}
