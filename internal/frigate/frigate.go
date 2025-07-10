@@ -479,48 +479,56 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		}
 	}
 
-	// Create message
-	msg := tgbotapi.MediaGroupConfig{
-		ChatID: conf.TelegramChatID,
-		Media:  medias,
-	}
-	msg.DisableNotification = redis.GetStateMuteEvent()
-
 	log.Debug.Printf("Sending media group with %d items", len(medias))
 
-	messages, err := bot.SendMediaGroup(msg)
-	if err != nil {
-		log.Error.Printf("Failed to send media group: %s", err.Error())
-		if strings.Contains(err.Error(), "file must be non-empty") {
-			// Try to get more information about the files we're trying to send
-			for i, media := range medias {
-				switch m := media.(type) {
-				case tgbotapi.InputMediaPhoto:
-					if filePath, ok := m.Media.(tgbotapi.FilePath); ok {
-						fileInfo, statErr := os.Stat(string(filePath))
-						if statErr != nil {
-							log.Error.Printf("Media item %d: Cannot get file info: %s", i, statErr.Error())
-						} else {
-							log.Error.Printf("Media item %d: Photo file exists, size: %d bytes", i, fileInfo.Size())
+	if len(medias) != 0 {
+		// Create message
+		msg := tgbotapi.MediaGroupConfig{
+			ChatID: conf.TelegramChatID,
+			Media:  medias,
+		}
+		msg.DisableNotification = redis.GetStateMuteEvent()
+
+		messages, err := bot.SendMediaGroup(msg)
+		if err != nil {
+			log.Error.Printf("Failed to send media group: %s", err.Error())
+			if strings.Contains(err.Error(), "file must be non-empty") {
+				// Try to get more information about the files we're trying to send
+				for i, media := range medias {
+					switch m := media.(type) {
+					case tgbotapi.InputMediaPhoto:
+						if filePath, ok := m.Media.(tgbotapi.FilePath); ok {
+							fileInfo, statErr := os.Stat(string(filePath))
+							if statErr != nil {
+								log.Error.Printf("Media item %d: Cannot get file info: %s", i, statErr.Error())
+							} else {
+								log.Error.Printf("Media item %d: Photo file exists, size: %d bytes", i, fileInfo.Size())
+							}
 						}
-					}
-				case tgbotapi.InputMediaVideo:
-					if filePath, ok := m.Media.(tgbotapi.FilePath); ok {
-						fileInfo, statErr := os.Stat(string(filePath))
-						if statErr != nil {
-							log.Error.Printf("Media item %d: Cannot get file info: %s", i, statErr.Error())
-						} else {
-							log.Error.Printf("Media item %d: Video file exists, size: %d bytes", i, fileInfo.Size())
+					case tgbotapi.InputMediaVideo:
+						if filePath, ok := m.Media.(tgbotapi.FilePath); ok {
+							fileInfo, statErr := os.Stat(string(filePath))
+							if statErr != nil {
+								log.Error.Printf("Media item %d: Cannot get file info: %s", i, statErr.Error())
+							} else {
+								log.Error.Printf("Media item %d: Video file exists, size: %d bytes", i, fileInfo.Size())
+							}
 						}
 					}
 				}
 			}
+			ErrorSend("Error send media group message: "+err.Error(), bot, FrigateEvent.ID)
 		}
-		ErrorSend("Error send media group message: "+err.Error(), bot, FrigateEvent.ID)
-	}
 
-	if messages == nil {
-		ErrorSend("No received messages", bot, FrigateEvent.ID)
+		if messages == nil {
+			ErrorSend("No received messages", bot, FrigateEvent.ID)
+		}
+	} else {
+		msg := tgbotapi.NewMessage(conf.TelegramChatID, "")
+		msg.Text = text
+		if _, err := bot.Send(msg); err != nil {
+			log.Error.Fatalln("Error sending message: " + err.Error())
+		}
 	}
 
 	// Now we can safely remove the files after the media group is sent
