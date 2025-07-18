@@ -247,7 +247,7 @@ func GetEvents(FrigateURL string, bot *tgbotapi.BotAPI, SetBefore bool) EventsSt
 	FrigateURL = FrigateURL + "?limit=" + strconv.Itoa(conf.FrigateEventLimit)
 
 	if SetBefore {
-		timestamp := time.Now().UTC().Unix()
+		timestamp := time.Now().In(conf.Timezone).Unix()
 		timestamp = timestamp - int64(conf.EventBeforeSeconds)
 		FrigateURL = FrigateURL + "&before=" + strconv.FormatInt(timestamp, 10)
 	}
@@ -369,7 +369,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 
 	// Prepare text message
 	text := ""
-	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
+	t_start := time.Unix(int64(FrigateEvent.StartTime), 0).In(conf.Timezone)
 	if conf.ShortEventMessageFormat {
 		// Short message format
 		text += fmt.Sprintf("#%s detected on #%s at %s",
@@ -389,7 +389,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		if FrigateEvent.EndTime == 0 {
 			text += "┣*End time*\n┗ `In progess`" + "\n"
 		} else {
-			t_end := time.Unix(int64(FrigateEvent.EndTime), 0)
+			t_end := time.Unix(int64(FrigateEvent.EndTime), 0).In(conf.Timezone)
 			text += fmt.Sprintf("┣*End time*\n┗ `%s", t_end) + "`\n"
 		}
 		text += fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
@@ -643,7 +643,7 @@ func SendTextEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 	text := "*New event*\n"
 	text += "┣*Camera*\n┗ `" + FrigateEvent.Camera + "`\n"
 	text += "┣*Label*\n┗ `" + FrigateEvent.Label + "`\n"
-	t_start := time.Unix(int64(FrigateEvent.StartTime), 0)
+	t_start := time.Unix(int64(FrigateEvent.StartTime), 0).In(conf.Timezone)
 	text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
 	text += fmt.Sprintf("┣*Top score*\n┗ `%f", (FrigateEvent.Data.TopScore*100)) + "%`\n"
 	text += "┣*Event id*\n┗ `" + FrigateEvent.ID + "`\n"

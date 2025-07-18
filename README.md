@@ -36,7 +36,7 @@ docker compose up -d
 | `TELEGRAM_CHAT_ID` | `0` | Telegram chat id. |
 | `SLEEP_TIME`| `5` | Sleep time after cycle, in second. |
 | `FRIGATE_EXTERNAL_URL` | `http://localhost:5000` | External link in frigate(need for generate link in message). |
-| `TZ` | `""` | Timezone |
+| `TZ` | `"UTC"` | Timezone (e.g., Europe/Paris, America/New_York) |
 | `REDIS_ADDR` | `localhost:6379` | IP and port redis |
 | `REDIS_PASSWORD` | `""` | Redis password |
 | `REDIS_DB` | `0` | Redis DB |
