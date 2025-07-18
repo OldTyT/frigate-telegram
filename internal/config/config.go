@@ -4,6 +4,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Config struct {
@@ -26,6 +27,7 @@ type Config struct {
 	RedisAddr               string
 	RedisPassword           string
 	RestAPIListenAddr       string
+	Timezone                *time.Location
 	FrigateIncludeCamera    []string
 	FrigateExcludeCamera    []string
 	FrigateExcludeLabel     []string
@@ -62,6 +64,7 @@ func New() *Config {
 		ShortEventMessageFormat: getEnvAsBool("SHORT_EVENT_MESSAGE_FORMAT", false),
 		IncludeThumbnailEvent:   getEnvAsBool("INCLUDE_THUMBNAIL_EVENT", true),
 		RestAPIListenAddr:       getEnv("REST_API_LISTEN_ADDR", ":8080"),
+		Timezone:                getEnvAsTimezone("TZ", "UTC"),
 	}
 }
 
@@ -115,4 +118,13 @@ func getEnvAsSlice(name string, defaultVal []string, sep string) []string {
 	val := strings.Split(valStr, sep)
 
 	return val
+}
+
+func getEnvAsTimezone(name string, defaultVal string) *time.Location {
+	valStr := getEnv(name, defaultVal)
+	if loc, err := time.LoadLocation(valStr); err == nil {
+		return loc
+	}
+	loc, _ := time.LoadLocation(defaultVal)
+	return loc
 }
