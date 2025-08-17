@@ -110,6 +110,16 @@ func ErrorSend(TextError string, bot *tgbotapi.BotAPI, EventID string) {
 	log.Error.Fatalln(TextError)
 }
 
+func WarnSend(TextError string, bot *tgbotapi.BotAPI, EventID string) {
+	conf := config.New()
+	TextError += "\nEventID: " + EventID
+	_, err := bot.Send(tgbotapi.NewMessage(conf.TelegramChatID, TextError))
+	if err != nil {
+		log.Error.Println(err.Error())
+	}
+	log.Warn.Println(TextError)
+}
+
 func SaveThumbnail(EventID string, Thumbnail string, bot *tgbotapi.BotAPI) string {
 	log.Debug.Printf("Processing thumbnail for event ID: %s", EventID)
 
@@ -263,7 +273,8 @@ func GetEvents(FrigateURL string, bot *tgbotapi.BotAPI, SetBefore bool) EventsSt
 
 	// Check response status code
 	if resp.StatusCode != 200 {
-		ErrorSend("Response status != 200, when getting events from Frigate.\nExit.", bot, "ALL")
+		WarnSend("Response status != 200, when getting events from Frigate.", bot, "ALL")
+		return EventsStruct{}
 	}
 
 	// Read data from response
@@ -312,7 +323,8 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 	// Read content length if available
 	contentLength := resp.ContentLength
 	if contentLength == 0 {
-		ErrorSend("Received empty clip from server (content length is 0)", bot, EventID)
+		WarnSend("Received empty clip from server (content length is 0)", bot, EventID)
+		return ""
 	}
 	log.Debug.Printf("Expected content length: %d bytes", contentLength)
 
@@ -332,7 +344,8 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 
 	// Check if we wrote anything
 	if bytesWritten == 0 {
-		ErrorSend("No data written to clip file", bot, EventID)
+		WarnSend("No data written to clip file", bot, EventID)
+		return ""
 	}
 
 	// Ensure file is properly synced to disk
@@ -453,6 +466,9 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		// Save clip
 		FilePathClip = SaveClip(FrigateEvent.ID, bot)
 		hasClip = true
+		if FilePathClip == "" {
+			hasClip = false
+		}
 
 		videoInfo, err := os.Stat(FilePathClip)
 		if err != nil {
