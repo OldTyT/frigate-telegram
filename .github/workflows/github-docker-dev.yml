@@ -13,7 +13,7 @@ jobs:
       IMAGE_NAME: oldtyt/frigate-telegram
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Variables
         id: vars
         run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
@@ -47,7 +47,7 @@ jobs:
       IMAGE_NAME: oldtyt/frigate-telegram
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Variables
         id: vars
         run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
@@ -80,7 +80,7 @@ jobs:
       IMAGE_NAME: oldtyt/frigate-telegram
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Variables
         id: vars
         run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
@@ -113,7 +113,7 @@ jobs:
       IMAGE_NAME: oldtyt/frigate-telegram
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Variables
         id: vars
         run: echo "::set-output name=SHORT_COMMIT_ID::$(git rev-parse --short HEAD)"
