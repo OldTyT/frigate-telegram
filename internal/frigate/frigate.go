@@ -39,10 +39,10 @@ type EventsStruct []struct {
 	PlusID             interface{} `json:"plus_id"`
 	RetainIndefinitely bool        `json:"retain_indefinitely"`
 	StartTime          float64     `json:"start_time"`
-	// SubLabel           []any       `json:"sub_label"`
-	Thumbnail string      `json:"thumbnail"`
-	TopScore  interface{} `json:"top_score"`
-	Zones     []any       `json:"zones"`
+	SubLabel           interface{} `json:"sub_label"`
+	Thumbnail          string      `json:"thumbnail"`
+	TopScore           interface{} `json:"top_score"`
+	Zones              []any       `json:"zones"`
 }
 
 type EventStruct struct {
@@ -65,10 +65,10 @@ type EventStruct struct {
 	PlusID             interface{} `json:"plus_id"`
 	RetainIndefinitely bool        `json:"retain_indefinitely"`
 	StartTime          float64     `json:"start_time"`
-	// SubLabel           []any       `json:"sub_label"`
-	Thumbnail string      `json:"thumbnail"`
-	TopScore  interface{} `json:"top_score"`
-	Zones     []any       `json:"zones"`
+	SubLabel           interface{} `json:"sub_label"`
+	Thumbnail          string      `json:"thumbnail"`
+	TopScore           interface{} `json:"top_score"`
+	Zones              []any       `json:"zones"`
 }
 
 var Events EventsStruct
@@ -90,12 +90,25 @@ func NormalizeTagText(text string) string {
 	return strings.Join(NormalizedText, "")
 }
 
-func GetTagList(Tags []any) []string {
+func GetTagList(subLabel interface{}) []string {
 	var my_tags []string
-	for _, zone := range Tags {
-		if zone != nil {
-			my_tags = append(my_tags, NormalizeTagText(zone.(string)))
+	switch v := subLabel.(type) {
+	case string:
+		if v != "" {
+			my_tags = append(my_tags, NormalizeTagText(v))
 		}
+	case []interface{}:
+		for _, item := range v {
+			switch itemVal := item.(type) {
+			case string:
+				my_tags = append(my_tags, NormalizeTagText(itemVal))
+			case float64:
+				// Maybe: my_tags = append(my_tags, fmt.Sprintf("%.2f%%", itemVal*100))
+			}
+		}
+	case nil:
+	default:
+		log.Warn.Printf("Unexpected sub_label type: %T", v)
 	}
 	return my_tags
 }
@@ -395,9 +408,12 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		text += "*Event*\n"
 		text += "┣*Camera*\n┗ #" + NormalizeTagText(FrigateEvent.Camera) + "\n"
 		text += "┣*Label*\n┗ #" + NormalizeTagText(FrigateEvent.Label) + "\n"
-		// if FrigateEvent.SubLabel != nil {
-		// 	text += "┣*SubLabel*\n┗ #" + strings.Join(GetTagList(FrigateEvent.SubLabel), ", #") + "\n"
-		// }
+		SubLabels := GetTagList(FrigateEvent.SubLabel)
+		if len(SubLabels) > 0 {
+			if FrigateEvent.SubLabel != nil {
+				text += "┣*SubLabel*\n┗ #" + strings.Join(SubLabels, ", #") + "\n"
+			}
+		}
 		text += fmt.Sprintf("┣*Start time*\n┗ `%s", t_start) + "`\n"
 		if FrigateEvent.EndTime == 0 {
 			text += "┣*End time*\n┗ `In progess`" + "\n"
