@@ -13,6 +13,6 @@ RUN apk --no-cache add tzdata
 
 COPY --from=builder /go/frigate-telegram/frigate-telegram /frigate-telegram
 
-USER 1000
+USER nobody
 
 ENTRYPOINT ["/frigate-telegram"]

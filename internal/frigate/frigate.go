@@ -469,29 +469,30 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		if FilePathClip == "" {
 			hasClip = false
 		}
-
-		videoInfo, err := os.Stat(FilePathClip)
-		if err != nil {
-			ErrorSend("Error receiving information about the clip file: "+err.Error(), bot, FrigateEvent.ID)
-		}
-
-		// Double check file size
-		if videoInfo.Size() == 0 {
-			log.Error.Printf("Clip file is empty: %s", FilePathClip)
-			hasClip = false
-		} else if videoInfo.Size() < 52428800 {
-			// Telegram don't send large file see for more: https://github.com/OldTyT/frigate-telegram/issues/5
-			// Add clip to media group
-			log.Debug.Printf("Adding clip to media group: %s (size: %d bytes)", FilePathClip, videoInfo.Size())
-			MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
-
-			if !conf.IncludeThumbnailEvent {
-				MediaClip.Caption = text
+		if hasClip {
+			videoInfo, err := os.Stat(FilePathClip)
+			if err != nil {
+				ErrorSend("Error receiving information about the clip file: "+err.Error(), bot, FrigateEvent.ID)
 			}
 
-			medias = append(medias, MediaClip)
-		} else {
-			log.Debug.Printf("Clip file size is too large: %d bytes (limit: 52428800)", videoInfo.Size())
+			// Double check file size
+			if videoInfo.Size() == 0 {
+				log.Error.Printf("Clip file is empty: %s", FilePathClip)
+				hasClip = false
+			} else if videoInfo.Size() < 52428800 {
+				// Telegram don't send large file see for more: https://github.com/OldTyT/frigate-telegram/issues/5
+				// Add clip to media group
+				log.Debug.Printf("Adding clip to media group: %s (size: %d bytes)", FilePathClip, videoInfo.Size())
+				MediaClip := tgbotapi.NewInputMediaVideo(tgbotapi.FilePath(FilePathClip))
+
+				if !conf.IncludeThumbnailEvent {
+					MediaClip.Caption = text
+				}
+
+				medias = append(medias, MediaClip)
+			} else {
+				log.Debug.Printf("Clip file size is too large: %d bytes (limit: 52428800)", videoInfo.Size())
+			}
 		}
 	}
 

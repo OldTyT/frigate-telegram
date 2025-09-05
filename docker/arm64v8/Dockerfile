@@ -7,12 +7,8 @@ RUN apk --no-cache add binutils && \
     go build . && \
     strip frigate-telegram
 
-FROM arm64v8/alpine
-
-RUN apk --no-cache add tzdata
+FROM gcr.io/distroless/static-debian12:nonroot
 
 COPY --from=builder /go/frigate-telegram/frigate-telegram /frigate-telegram
-
-USER 1000
 
 ENTRYPOINT ["/frigate-telegram"]
