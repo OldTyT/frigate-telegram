@@ -61,7 +61,8 @@ func ChatBot(bot *tgbotapi.BotAPI, conf *config.Config) {
 			msg.Text = "I don't know that command"
 		}
 		if _, err := bot.Send(msg); err != nil {
-			log.Error.Fatalln("Error sending message: " + err.Error())
+			//ABlog.Error.Fatalln("Error sending message: " + err.Error())
+			log.Error.Println("Error sending message: " + err.Error())
 		}
 	}
 }

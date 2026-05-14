@@ -202,6 +202,7 @@ func RunServer(conf *config.Config) {
 	log.Info.Println("Start Rest API on " + conf.RestAPIListenAddr)
 	err := r.Run(conf.RestAPIListenAddr)
 	if err != nil {
-		log.Error.Fatalln("Error starting Rest API: " + err.Error())
+		//ABlog.Error.Fatalln("Error starting Rest API: " + err.Error())
+		log.Error.Println("Error starting Rest API: " + err.Error())
 	}
 }

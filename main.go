@@ -37,7 +37,8 @@ func main() {
 	// Initializing telegram bot
 	bot, err := tgbotapi.NewBotAPI(conf.TelegramBotToken)
 	if err != nil {
-		log.Error.Fatalln("Error initalizing telegram bot: " + err.Error())
+		log.Error.Println("Error initalizing telegram bot: " + err.Error())
+		return
 	}
 	bot.Debug = conf.Debug
 	log.Info.Println("Authorized on account " + bot.Self.UserName)

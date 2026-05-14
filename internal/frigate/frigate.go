@@ -120,7 +120,7 @@ func ErrorSend(TextError string, bot *tgbotapi.BotAPI, EventID string) {
 	if err != nil {
 		log.Error.Println(err.Error())
 	}
-	log.Error.Fatalln(TextError)
+	log.Error.Println(TextError)
 }
 
 func WarnSend(TextError string, bot *tgbotapi.BotAPI, EventID string) {
@@ -182,18 +182,37 @@ func SaveThumbnail(EventID string, Thumbnail string, bot *tgbotapi.BotAPI) strin
 	}
 
 	// Verify file exists and has content
-	fileInfo, err := os.Stat(filename)
+	//ABfileInfo, err := os.Stat(filename)
+	fileInfo, err := waitForFile(filename, 5, 200*time.Millisecond)
 	if err != nil {
-		ErrorSend("Error verifying thumbnail file: "+err.Error(), bot, EventID)
+		//ABErrorSend("Error verifying thumbnail file: "+err.Error(), bot, EventID)
+		log.Warn.Println("file missing:", err)
+		return ""
 	}
 
 	if fileInfo.Size() == 0 {
-		ErrorSend("Thumbnail file is empty after write", bot, EventID)
+		//ABErrorSend("Thumbnail file is empty after write", bot, EventID)
+		log.Warn.Println("thumbnail file empty:", filename)
+		return ""
+
 	}
 
 	log.Debug.Printf("Successfully saved thumbnail to %s (size: %d bytes)", filename, fileInfo.Size())
 	return filename
 }
+
+
+func waitForFile(filename string, attempts int, delay time.Duration) (os.FileInfo, error) {
+    for i := 0; i < attempts; i++ {
+        fi, err := os.Stat(filename)
+        if err == nil && fi.Size() > 0 {
+            return fi, nil
+        }
+        time.Sleep(delay)
+    }
+    return nil, fmt.Errorf("file not ready")
+}
+
 
 func DownloadThumbnail(EventID string, bot *tgbotapi.BotAPI) string {
 	// Get config
@@ -251,13 +270,15 @@ func DownloadThumbnail(EventID string, bot *tgbotapi.BotAPI) string {
 	}
 
 	// Verify file exists and has content
-	fileInfo, err := os.Stat(filename)
+	fileInfo, err := waitForFile(filename, 5, 200*time.Millisecond)
 	if err != nil {
-		ErrorSend("Error verifying thumbnail file: "+err.Error(), bot, EventID)
+	    log.Warn.Println("clip file not ready:", err)
+	    return ""
 	}
-
+	
 	if fileInfo.Size() == 0 {
-		ErrorSend("Thumbnail file is empty after download", bot, EventID)
+	    log.Warn.Println("clip file empty:", filename)
+	    return ""
 	}
 
 	log.Debug.Printf("Successfully downloaded thumbnail to %s (size: %d bytes)", filename, fileInfo.Size())
@@ -374,15 +395,16 @@ func SaveClip(EventID string, bot *tgbotapi.BotAPI) string {
 	}
 
 	// Verify file exists and has content
-	fileInfo, err := os.Stat(filename)
+	fileInfo, err := waitForFile(filename, 5, 200*time.Millisecond)
 	if err != nil {
-		ErrorSend("Error verifying clip file: "+err.Error(), bot, EventID)
+	    log.Warn.Println("clip file not ready:", err)
+	    return ""
 	}
-
+	
 	if fileInfo.Size() == 0 {
-		ErrorSend("Clip file is empty after download", bot, EventID)
+	    log.Warn.Println("clip file empty:", filename)
+	    return ""
 	}
-
 	log.Debug.Printf("Successfully downloaded clip to %s (size: %d bytes)", filename, fileInfo.Size())
 	return filename
 }
@@ -560,7 +582,7 @@ func SendMessageEvent(FrigateEvent EventStruct, bot *tgbotapi.BotAPI) {
 		msg := tgbotapi.NewMessage(conf.TelegramChatID, "")
 		msg.Text = text
 		if _, err := bot.Send(msg); err != nil {
-			log.Error.Fatalln("Error sending message: " + err.Error())
+			log.Error.Println("Error sending message: " + err.Error())
 		}
 	}
 
