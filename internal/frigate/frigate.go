@@ -120,7 +120,7 @@ func ErrorSend(TextError string, bot *tgbotapi.BotAPI, EventID string) {
 	if err != nil {
 		log.Error.Println(err.Error())
 	}
-	log.Error.Fatalln(TextError)
+	log.Error.Println(TextError)
 }
 
 func WarnSend(TextError string, bot *tgbotapi.BotAPI, EventID string) {
@@ -182,17 +182,30 @@ func SaveThumbnail(EventID string, Thumbnail string, bot *tgbotapi.BotAPI) strin
 	}
 
 	// Verify file exists and has content
-	fileInfo, err := os.Stat(filename)
+	fileInfo, err := waitForFile(filename, 5, 200*time.Millisecond)
 	if err != nil {
-		ErrorSend("Error verifying thumbnail file: "+err.Error(), bot, EventID)
+		log.Warn.Println("File missing:", err)
+		return ""
 	}
 
 	if fileInfo.Size() == 0 {
-		ErrorSend("Thumbnail file is empty after write", bot, EventID)
+		log.Warn.Println("Thumbnail file is empty after write file: ", filename)
+		return ""
 	}
 
 	log.Debug.Printf("Successfully saved thumbnail to %s (size: %d bytes)", filename, fileInfo.Size())
 	return filename
+}
+
+func waitForFile(filename string, attempts int, delay time.Duration) (os.FileInfo, error) {
+	for i := 0; i < attempts; i++ {
+		fi, err := os.Stat(filename)
+		if err == nil && fi.Size() > 0 {
+			return fi, nil
+		}
+		time.Sleep(delay)
+	}
+	return nil, fmt.Errorf("file not ready")
 }
 
 func DownloadThumbnail(EventID string, bot *tgbotapi.BotAPI) string {
